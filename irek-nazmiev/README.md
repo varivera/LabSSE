@@ -47,3 +47,5 @@ If all the structure is made right, it can be executed and result can be got.
 * Execution module - _executes sequentially (by topological order) all the blocks and recieves the result. First, the program goes through the "Field" list and sorts it by topological sort (sorter). Then module analyses the object to determine its type and check on errors (analyser), processes it to get inputs and right code to execute (processor), executes it and get the result (executor). Finally, the result is transfered into the next block as input (transferer) and iteration goes to the next block. Module is activated by pressing the button ``RUN``_
 
 ![Sketch of program architecture](https://github.com/varivera/LabSSE/blob/folder-design/irek-nazmiev/img/architecture-sketch.png?raw=true)
+
+![Sketch of program architecture 2](https://github.com/varivera/LabSSE/blob/folder-design/irek-nazmiev/img/architecture-sketch2.png?raw=true)
