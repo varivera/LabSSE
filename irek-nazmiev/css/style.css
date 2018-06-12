@@ -1,6 +1,18 @@
 body {
      margin: 0;
+     font-family: "Roboto", sans-serif;
+     color: black;
 }
+
+button {
+     padding: 0;
+     background-color: unset;
+     border: none;
+}
+
+button:focus { outline: none; }
+
+/*                                 H E A D E R                                */
 
 header {
      background-color: #ff8800;
@@ -9,8 +21,67 @@ header {
      position: absolute;
      top: 0;
      left: 0;
+
+     display: flex;
      z-index: 2;
 }
+
+header > div {
+     height: 100%;
+}
+
+#tools {
+     width: 20vw;
+
+     display: flex;
+     align-items: center;
+     justify-content: flex-start;
+}
+
+#tools > button{
+     width: 5vh;
+     height: 5vh;
+     outline: 0.5vh solid black;
+     margin-left: 2vw;
+
+     display: flex;
+}
+
+#logo {
+     width: 35vw;
+     font-size: 4.5vh;
+     font-weight: 600;
+
+     display: flex;
+     justify-content: flex-end;
+     align-items: center;
+}
+
+#menu {
+     width: 45vw;
+     font-size: 2.5vh;
+     color: white;
+
+     display: flex;
+     justify-content: flex-end;
+     align-items: center;
+}
+
+#menu > a {
+     text-decoration: none;
+     font-weight: 500;
+     margin-right: 2vw;
+}
+
+#menu > a:visited {
+     color: black;
+}
+
+#menu > a:hover {
+     text-decoration: underline;
+}
+
+/*                                 F I E L D                                  */
 
 #field {
      width: 100vw;
@@ -18,6 +89,8 @@ header {
      background-color: #dfdfdf;
      z-index: 0;
 }
+
+/*                                 B L O C K - P A N E L                      */
 
 #block-panel {
      width: 20vw;
