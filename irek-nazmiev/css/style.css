@@ -1,0 +1,30 @@
+body {
+     margin: 0;
+}
+
+header {
+     background-color: #ff8800;
+     height: 7vh;
+     width: 100vw;
+     position: absolute;
+     top: 0;
+     left: 0;
+     z-index: 2;
+}
+
+#field {
+     width: 100vw;
+     height: 100vh;
+     background-color: #dfdfdf;
+     z-index: 0;
+}
+
+#block-panel {
+     width: 20vw;
+     height: 100vh;
+     background-color: white;
+     position: absolute;
+     left: 0;
+     top: 0;
+     z-index: 1;
+}
