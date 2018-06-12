@@ -134,6 +134,10 @@ header {
      outline: 0.4vh solid black;
 }
 
+.block-group-title:focus {
+     outline: 0.4vh solid black;
+}
+
 .block-group-wrapper {
 
 }

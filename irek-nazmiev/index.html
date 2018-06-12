@@ -45,7 +45,7 @@
           <aside id="block-panel">
                <div id="block-panel-inside">
                     <div id="in-out-block-group" class="block-group">
-                         <button class="block-group-title" name="button">Input/Output</button>
+                         <button class="block-group-title" onclick="openCloseSpoiler(this);" name="shown">Input/Output</button>
                          <div class="block-group-wrapper">
                               <button class="add-block-button" name="input">input</button>
                               <button class="add-block-button" name="output">output</button>
@@ -53,7 +53,7 @@
                     </div>
 
                     <div id="math-block-group" class="block-group">
-                         <button class="block-group-title" name="button">Mathematical</button>
+                         <button class="block-group-title" onclick="openCloseSpoiler(this);" name="shown">Mathematical</button>
                          <div class="block-group-wrapper">
                               <button class="add-block-button" name="add">add</button>
                               <button class="add-block-button" name="sub">sub</button>
@@ -63,7 +63,7 @@
                     </div>
 
                     <div id="string-block-group" class="block-group">
-                         <button class="block-group-title" name="button">String</button>
+                         <button class="block-group-title" onclick="openCloseSpoiler(this);" name="shown">String</button>
                          <div class="block-group-wrapper">
                               <button class="add-block-button" name="replace">replace</button>
                               <button class="add-block-button" name="is-substring">isSubstring</button>
