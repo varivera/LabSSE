@@ -17,28 +17,61 @@
 
           <link rel="icon" href="img/icon.png">
           <link rel="stylesheet" href="css/style.css">
+
+          <script type="text/javascript" src="js/spoiler.js">
+
+          </script>
      </head>
 
      <body>
           <header id="header">
-               <div id="tools">
-                    <button type="button" name="input"></button>
-                    <button type="button" name="output"></button>
-                    <button type="button" name="remove"></button>
+               <div id="tools" class="header-block">
+                    <button class="tool" type="button" name="add-input"></button>
+                    <button class="tool" type="button" name="add-output"></button>
+                    <button class="tool" type="button" name="remove-wire"></button>
                </div>
 
-               <div id="logo">
+               <div id="logo" class="header-block">
                     <div>Drag&Code</div>
                </div>
 
-               <div id="menu">
-                    <a href="#">main</a>
-                    <a href="#">profile</a>
-                    <a href="#">log out</a>
-               </div>
+               <nav id="nav" class="header-block">
+                    <a class="nav-section" href="#">main</a>
+                    <a class="nav-section" href="#">profile</a>
+                    <a class="nav-section" href="#">log out</a>
+               </nav>
           </header>
 
           <aside id="block-panel">
+               <div id="block-panel-inside">
+                    <div id="in-out-block-group" class="block-group">
+                         <button class="block-group-title" name="button">Input/Output</button>
+                         <div class="block-group-wrapper">
+                              <button class="add-block-button" name="input">input</button>
+                              <button class="add-block-button" name="output">output</button>
+                         </div>
+                    </div>
+
+                    <div id="math-block-group" class="block-group">
+                         <button class="block-group-title" name="button">Mathematical</button>
+                         <div class="block-group-wrapper">
+                              <button class="add-block-button" name="add">add</button>
+                              <button class="add-block-button" name="sub">sub</button>
+                              <button class="add-block-button" name="mult">mult</button>
+                              <button class="add-block-button" name="div">div</button>
+                         </div>
+                    </div>
+
+                    <div id="string-block-group" class="block-group">
+                         <button class="block-group-title" name="button">String</button>
+                         <div class="block-group-wrapper">
+                              <button class="add-block-button" name="replace">replace</button>
+                              <button class="add-block-button" name="is-substring">isSubstring</button>
+                              <button class="add-block-button" name="concatenate">concatenate</button>
+                         </div>
+                    </div>
+
+               </div>
           </aside>
 
           <section id="field">
