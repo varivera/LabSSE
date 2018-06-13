@@ -170,8 +170,8 @@ header {
 #field .block {
      height: 80px;
      width: 180px;
+     margin: 0;
+     font-size: 35px;
      background-color: white;
-     position: absolute;
-     top: 50vh;
-     left: 50vw;
+     position: fixed;
 }
