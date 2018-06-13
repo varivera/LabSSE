@@ -139,7 +139,8 @@ header {
 }
 
 .block-group-wrapper {
-
+     padding: 1vw;
+     padding-top: 0;
 }
 
 .add-block-button {
