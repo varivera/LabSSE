@@ -47,27 +47,27 @@
                     <div id="in-out-block-group" class="block-group">
                          <button class="block-group-title" onclick="openCloseSpoiler(this);" name="shown">Input/Output</button>
                          <div class="block-group-wrapper">
-                              <button class="add-block-button" name="input">input</button>
-                              <button class="add-block-button" name="output">output</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="input">input</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="output">output</button>
                          </div>
                     </div>
 
                     <div id="math-block-group" class="block-group">
                          <button class="block-group-title" onclick="openCloseSpoiler(this);" name="shown">Mathematical</button>
                          <div class="block-group-wrapper">
-                              <button class="add-block-button" name="add">add</button>
-                              <button class="add-block-button" name="sub">sub</button>
-                              <button class="add-block-button" name="mult">mult</button>
-                              <button class="add-block-button" name="div">div</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="add">add</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="sub">sub</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="mult">mult</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="div">div</button>
                          </div>
                     </div>
 
                     <div id="string-block-group" class="block-group">
                          <button class="block-group-title" onclick="openCloseSpoiler(this);" name="shown">String</button>
                          <div class="block-group-wrapper">
-                              <button class="add-block-button" name="replace">replace</button>
-                              <button class="add-block-button" name="is-substring">isSubstring</button>
-                              <button class="add-block-button" name="concatenate">concatenate</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="replace">replace</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="is-substring">isSubstring</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="concatenate">concatenate</button>
                          </div>
                     </div>
 

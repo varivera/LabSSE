@@ -9,25 +9,9 @@ function openCloseSpoiler(block) {
      }
 }
 
-function addBlock(type) {
-     switch(type) {
-          case "input":
-               break;
-          case "output":
-               break;
-          case "add":
-               break;
-          case "sub":
-               break;
-          case "mult":
-               break;
-          case "div":
-               break;
-          case "replace":
-               break;
-          case "is-substring":
-               break;
-          case "concatenate":
-               break;
-     }
+function addBlock(content) {
+     var block = document.createElement("button");
+     block.className = "block";
+     block.innerHTML = content;
+     field.appendChild(block);
 }
