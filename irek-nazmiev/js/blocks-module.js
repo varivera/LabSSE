@@ -13,10 +13,8 @@ function addBlock(content) {
      var block = document.createElement("button");
      block.className = "block";
      block.innerHTML = content;
-     block.style.top = field.clientHeight / 2 + "px";
-     block.style.left = field.clientWidth / 2 + "px";
      block.setAttribute("onmousemove", "moveBlock(this);");
-     field.appendChild(block);
+     field.children[0].appendChild(block);
 }
 
 function hideShowBlockPanel(block) {

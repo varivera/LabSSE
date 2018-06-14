@@ -207,14 +207,26 @@ header {
      width: 100vw;
      height: 93vh;
      background-color: #dfdfdf;
+     overflow: hidden;
      z-index: 0;
 }
 
-#field .block {
+#field-movable {
+     height: 100px;
+     width: 100px;
+
+     position: fixed;
+     top: 50vh;
+     left: 50vw;
+}
+
+.block {
      height: 80px;
      width: 180px;
+     top: 0;
+     left: 0;
      font-size: 35px;
      box-shadow: 0 0 0.9vh 0.3vh rgba(0,0,0,0.2);
      background-color: white;
-     position: fixed;
+     position: absolute;
 }
