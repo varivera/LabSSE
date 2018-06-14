@@ -99,12 +99,26 @@ header {
      width: 20vw;
      height: 100vh;
      background-color: white;
-     overflow: hidden;
 
      position: absolute;
      left: 0;
      top: 0;
      z-index: 1;
+}
+
+#block-panel-hider {
+     height: 5vh;
+     width: 2vw;
+     background: white url(../img/left-arrow.png) left center no-repeat;
+     background-size: 80%;
+     border: 0.2vw solid black;
+     border-left: none;
+     border-radius: 0 50% 50% 0;
+
+     position: absolute;
+     right: -2vw;
+     top: 50vh;
+
 }
 
 #block-panel-inside {
@@ -171,8 +185,8 @@ header {
      font-size: 2vw;
 
      position: absolute;
-     bottom: -15.7vh;
-     left: 0;
+     bottom: 0;
+     left: -20vw;
 }
 
 #trash-can {

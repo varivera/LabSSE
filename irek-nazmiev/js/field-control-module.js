@@ -7,7 +7,7 @@ function moveBlock(block) {
               shiftY = e.pageY - blockCoords.top;
 
           block.style.zIndex = 1000;
-          document.getElementById("trash-can-wrapper").style.bottom = 0;
+          document.getElementById("trash-can-wrapper").style.left = 0;
 
           document.onmousemove = function(e) {    // when mouse is moving, change block's coordinates
                block.style.left = e.pageX - shiftX + 'px';
@@ -22,7 +22,7 @@ function moveBlock(block) {
                block.style.zIndex = "unset";
                if (isInTrashCan(x, y))
                     block.remove();
-               document.getElementById("trash-can-wrapper").style.bottom = "-15.7vh";
+               document.getElementById("trash-can-wrapper").style.left = "-20vw";
           };
 
           function isInTrashCan(x, y){

@@ -18,3 +18,16 @@ function addBlock(content) {
      block.setAttribute("onmousemove", "moveBlock(this);");
      field.appendChild(block);
 }
+
+function hideShowBlockPanel(block) {
+     if (block.name == "shown") {
+          block.name = "hided";
+          block.style.backgroundImage = "url(img/right-arrow.png)";
+          block.parentElement.style.left = "-20vw";
+     }
+     else {
+          block.name = "shown";
+          block.style.backgroundImage = "url(img/left-arrow.png)";
+          block.parentElement.style.left = "0";
+     }
+}
