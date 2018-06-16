@@ -225,8 +225,56 @@ header {
      width: 180px;
      top: 0;
      left: 0;
-     font-size: 35px;
+     font-size: 25px;
      box-shadow: 0 0 0.9vh 0.3vh rgba(0,0,0,0.2);
      background-color: white;
+
+     position: absolute;
+     z-index: 1;
+}
+
+.connectors {
+     width: 20px;
+     height: inherit;
+
+     position: absolute;
+     top: 0;
+
+     display: flex;
+     flex-direction: column;
+     justify-content: space-around;
+     align-items: center;
+}
+
+.input-connectors {
+     left: -10px;
+}
+
+.output-connectors {
+     right: -10px;
+}
+
+.con {
+     width: 15px;
+     height: 15px;
+     border-radius: 50%;
+     z-index: 0;
+}
+
+.in-con {
+     background-color: white;
+     border: 2px solid black;
+}
+
+.out-con {
+     background-color: black;
+     border: 2px solid white;
+}
+
+.line {
+     height: 0px;
+     border: 1px solid black;
+     background-color: black;
+
      position: absolute;
 }
