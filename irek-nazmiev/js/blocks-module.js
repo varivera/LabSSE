@@ -28,6 +28,7 @@ function addBlock(content) {
      var block = document.createElement("button");
 
      block.className = "block";
+     block.name = maxId++;
      block.setAttribute("onmousemove", "moveBlock(this);");
 
      if (content == 'input')

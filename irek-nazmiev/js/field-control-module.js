@@ -1,46 +1,92 @@
-var isBusy = false;
+var isBusy = false,
+    maxId = 0;
 
 function moveBlock(block) {
-          block.onmousedown = function(e) {       // start moving on first click
-               if (!isBusy) {
-                    if (e.button == 0) {
-                         var x, y;
+     block.onmousedown = function(e) {       // start moving on first click
+          console.log(e.pageX + "/" + e.pageY);
+          if (!isBusy) {
+               if (e.button == 0) {
+                    var x, y;
 
-                         var blockCoords = block.getBoundingClientRect(),
-                             shiftX = e.pageX - blockCoords.left,
-                             shiftY = e.pageY - blockCoords.top;
+                    var blockCoords = block.getBoundingClientRect(),
+                        shiftX = e.pageX - blockCoords.left,
+                        shiftY = e.pageY - blockCoords.top;
 
-                         block.parentElement.style.zIndex = 1000;
-                         document.getElementById("trash-can-wrapper").style.left = 0;
+                    block.parentElement.style.zIndex = 1000;
+                    document.getElementById("trash-can-wrapper").style.left = 0;
 
-                         document.onmousemove = function(e) {    // when mouse is moving, change block's coordinates
-                                   var fieldMovableCoords = field.children[0].getBoundingClientRect();
-                                   block.style.left = e.pageX - shiftX - fieldMovableCoords.left + 'px';
-                                   block.style.top = e.pageY - shiftY - fieldMovableCoords.top + 'px';
+                    var linesList = [].slice.call(document.getElementsByClassName("line"));
+                    linesList.forEach(function(line) {
+                         if (!line.textContent.includes(block.name))
+                              linesList.splice(linesList.indexOf(line), 1);
+                    });
 
-                                   x = e.pageX;
-                                   y = e.pageY;
-                         };
+                    document.onmousemove = function(e) {    // when mouse is moving, change block's coordinates
+                         var fieldMovableCoords = field.children[0].getBoundingClientRect();
 
-                         block.onmouseup = function() {          // stop moving on second click
-                              document.onmousemove = null;
-                              block.onmouseup = null;
-                              block.parentElement.style.zIndex = "unset";
-                              if (isInTrashCan(x, y))
-                                   block.remove();
-                              document.getElementById("trash-can-wrapper").style.left = "-20vw";
-                         };
+                         block.style.left = e.pageX - shiftX - fieldMovableCoords.left + 'px';
+                         block.style.top = e.pageY - shiftY - fieldMovableCoords.top + 'px';
 
-                         function isInTrashCan(x, y){
-                              var trashCanCoords = document.getElementById("trash-can").getBoundingClientRect();
-                              return x >= trashCanCoords.left &
-                                     x <= (trashCanCoords.left + trashCanCoords.width) &
-                                     y >= trashCanCoords.top &
-                                     y <= (trashCanCoords.top + trashCanCoords.height);
-                         }
+                         // linesList.forEach( function(line) {
+                         //      var lineCoords = line.getBoundingClientRect(),
+                         //          angle = +line.style.transform.slice(7, -4);
+                         //
+                         //      if (angle >= 0 && angle <= Math.PI / 2) {
+                         //           var x1 = lineCoords.x - fieldMovableCoords.x,
+                         //               y1 = lineCoords.y - fieldMovableCoords.y,
+                         //               x2 = lineCoords.right - fieldMovableCoords.x,
+                         //               y2 = lineCoords.bottom - fieldMovableCoords.y;
+                         //      } else if (angle > Math.PI / 2 && angle <= Math.PI) {
+                         //           var x1 = lineCoords.right - fieldMovableCoords.x,
+                         //               y1 = lineCoords.y - fieldMovableCoords.y,
+                         //               x2 = lineCoords.x - fieldMovableCoords.x,
+                         //               y2 = lineCoords.bottom - fieldMovableCoords.y;
+                         //      } else if (angle > Math.PI && angle <= 1.5*Math.PI) {
+                         //           var x1 = lineCoords.right - fieldMovableCoords.x,
+                         //               y1 = lineCoords.bottom - fieldMovableCoords.y,
+                         //               x2 = lineCoords.x - fieldMovableCoords.x,
+                         //               y2 = lineCoords.y - fieldMovableCoords.y;
+                         //      } else if (angle > 1.5*Math.PI && angle <= 2*Math.PI) {
+                         //           var x1 = lineCoords.x - fieldMovableCoords.x,
+                         //               y1 = lineCoords.bottom - fieldMovableCoords.y,
+                         //               x2 = lineCoords.right - fieldMovableCoords.x,
+                         //               y2 = lineCoords.y - fieldMovableCoords.y;
+                         //      }
+                         //
+                         //      // if (line.textContent.split('-')[0] == block.name) {    // head is here
+                         //      //
+                         //      // } else {
+                         //      //
+                         //      // }
+                         //
+                         //      console.log(x1, y1, x2, y2);
+                         //
+                         //      updateLineElement(line, x1, y1, x2, y2);
+                         // });
+
+                         x = e.pageX;
+                         y = e.pageY;
+                    };
+
+                    block.onmouseup = function() {          // stop moving on second click
+                         document.onmousemove = null;
+                         block.onmouseup = null;
+                         block.parentElement.style.zIndex = "unset";
+                         if (isInTrashCan(x, y))
+                              block.remove();
+                         document.getElementById("trash-can-wrapper").style.left = "-20vw";
+                    };
+
+                    function isInTrashCan(x, y){
+                         var trashCanCoords = document.getElementById("trash-can").getBoundingClientRect();
+                         return x >= trashCanCoords.left &
+                                x <= (trashCanCoords.left + trashCanCoords.width) &
+                                y >= trashCanCoords.top &
+                                y <= (trashCanCoords.top + trashCanCoords.height);
                     }
                }
           }
+     }
 }
 
 function moveField(block) {
@@ -120,14 +166,14 @@ function connect(connector) {
           field.children[0].appendChild(line);
 
           document.onmousemove = function(e) {
-               var fieldMovableCoords = field.children[0].getBoundingClientRect(),
-                   x2 = e.pageX - fieldMovableCoords.x,
+               var x2 = e.pageX - fieldMovableCoords.x,
                    y2 = e.pageY - fieldMovableCoords.y;
 
                updateLineElement(line, x1, y1, x2, y2);
 
                document.onclick = function(e) {
                     if (e.target.name == 'no-con' && (connector.className != e.target.className) && (connector.parentElement.parentElement != e.target.parentElement.parentElement)) {
+                         line.textContent = connector.parentElement.parentElement.name + "-" + e.target.parentElement.parentElement.name;
                          e.target.name = 'con';
                          connector.name = 'con';
                          document.onmousemove = null;
@@ -137,10 +183,12 @@ function connect(connector) {
                }
 
                document.oncontextmenu = function(e) {
-                    document.onmousemove = null;
-                    document.onclick = null;
-                    line.remove();
-                    isBusy = false;
+                    if (isBusy) {
+                         document.onmousemove = null;
+                         document.onclick = null;
+                         line.remove();
+                         isBusy = false;
+                    }
                }
           };
      }
