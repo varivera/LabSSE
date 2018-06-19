@@ -3,7 +3,6 @@ var isBusy = false,
 
 function moveBlock(block) {
      block.onmousedown = function(e) {       // start moving on first click
-          console.log(e.pageX + "/" + e.pageY);
           if (!isBusy) {
                if (e.button == 0) {
                     var x, y;
@@ -15,9 +14,48 @@ function moveBlock(block) {
                     block.parentElement.style.zIndex = 1000;
                     document.getElementById("trash-can-wrapper").style.left = 0;
 
+                    var fieldMovableCoords = field.children[0].getBoundingClientRect();
                     var linesList = [].slice.call(document.getElementsByClassName("line"));
-                    linesList.forEach(function(line) {
-                         if (!line.textContent.includes(block.name))
+                    linesList = linesList.filter( function(line) {return line.textContent.includes(block.name)});
+
+                    linesList.forEach( function(line) {
+                              var lineCoords = line.getBoundingClientRect(),
+                                  angle = +line.style.transform.slice(7, -4);
+
+                              if (angle >= 0 && angle <= Math.PI / 2) {
+                                   var x1 = lineCoords.x - fieldMovableCoords.x,
+                                       y1 = lineCoords.y - fieldMovableCoords.y,
+                                       x2 = lineCoords.right - fieldMovableCoords.x,
+                                       y2 = lineCoords.bottom - fieldMovableCoords.y;
+                              } else if (angle > Math.PI / 2 && angle <= Math.PI) {
+                                   var x1 = lineCoords.right - fieldMovableCoords.x,
+                                       y1 = lineCoords.y - fieldMovableCoords.y,
+                                       x2 = lineCoords.x - fieldMovableCoords.x,
+                                       y2 = lineCoords.bottom - fieldMovableCoords.y;
+                              } else if (angle > Math.PI && angle <= 1.5*Math.PI) {
+                                   var x1 = lineCoords.right - fieldMovableCoords.x,
+                                       y1 = lineCoords.bottom - fieldMovableCoords.y,
+                                       x2 = lineCoords.x - fieldMovableCoords.x,
+                                       y2 = lineCoords.y - fieldMovableCoords.y;
+                              } else if (angle > 1.5*Math.PI && angle <= 2*Math.PI) {
+                                   var x1 = lineCoords.x - fieldMovableCoords.x,
+                                       y1 = lineCoords.bottom - fieldMovableCoords.y,
+                                       x2 = lineCoords.right - fieldMovableCoords.x,
+                                       y2 = lineCoords.y - fieldMovableCoords.y;
+                              }
+
+                              linesList.splice(linesList.indexOf(line) + 1, 0, {
+                                   item: line,
+                                   x1: x1,
+                                   y1: y1,
+                                   x2: x2,
+                                   y2: y2,
+                                   shiftX1: x1 - e.pageX,
+                                   shiftY1: y1 - e.pageY,
+                                   shiftX2: x2 - e.pageX,
+                                   shiftY2: y2 - e.pageY,
+                              });
+
                               linesList.splice(linesList.indexOf(line), 1);
                     });
 
@@ -27,53 +65,35 @@ function moveBlock(block) {
                          block.style.left = e.pageX - shiftX - fieldMovableCoords.left + 'px';
                          block.style.top = e.pageY - shiftY - fieldMovableCoords.top + 'px';
 
-                         // linesList.forEach( function(line) {
-                         //      var lineCoords = line.getBoundingClientRect(),
-                         //          angle = +line.style.transform.slice(7, -4);
-                         //
-                         //      if (angle >= 0 && angle <= Math.PI / 2) {
-                         //           var x1 = lineCoords.x - fieldMovableCoords.x,
-                         //               y1 = lineCoords.y - fieldMovableCoords.y,
-                         //               x2 = lineCoords.right - fieldMovableCoords.x,
-                         //               y2 = lineCoords.bottom - fieldMovableCoords.y;
-                         //      } else if (angle > Math.PI / 2 && angle <= Math.PI) {
-                         //           var x1 = lineCoords.right - fieldMovableCoords.x,
-                         //               y1 = lineCoords.y - fieldMovableCoords.y,
-                         //               x2 = lineCoords.x - fieldMovableCoords.x,
-                         //               y2 = lineCoords.bottom - fieldMovableCoords.y;
-                         //      } else if (angle > Math.PI && angle <= 1.5*Math.PI) {
-                         //           var x1 = lineCoords.right - fieldMovableCoords.x,
-                         //               y1 = lineCoords.bottom - fieldMovableCoords.y,
-                         //               x2 = lineCoords.x - fieldMovableCoords.x,
-                         //               y2 = lineCoords.y - fieldMovableCoords.y;
-                         //      } else if (angle > 1.5*Math.PI && angle <= 2*Math.PI) {
-                         //           var x1 = lineCoords.x - fieldMovableCoords.x,
-                         //               y1 = lineCoords.bottom - fieldMovableCoords.y,
-                         //               x2 = lineCoords.right - fieldMovableCoords.x,
-                         //               y2 = lineCoords.y - fieldMovableCoords.y;
-                         //      }
-                         //
-                         //      // if (line.textContent.split('-')[0] == block.name) {    // head is here
-                         //      //
-                         //      // } else {
-                         //      //
-                         //      // }
-                         //
-                         //      console.log(x1, y1, x2, y2);
-                         //
-                         //      updateLineElement(line, x1, y1, x2, y2);
-                         // });
+                         linesList.forEach( function(line) {
+                              if (line.item.textContent.split('-')[0] == block.name) {    // head is here
+                                   var x1 = e.pageX + line.shiftX1,
+                                       y1 = e.pageY + line.shiftY1;
+                                   updateLineElement(line.item, x1, y1, line.x2, line.y2)
+                              } else {
+                                   var x2 = e.pageX + line.shiftX2,
+                                       y2 = e.pageY + line.shiftY2;
+                                   updateLineElement(line.item, line.x1, line.y1, x2, y2)
+                              }
+                         });
 
                          x = e.pageX;
                          y = e.pageY;
                     };
 
-                    block.onmouseup = function() {          // stop moving on second click
+                    block.onmouseup = function(e) {          // stop moving on second click
                          document.onmousemove = null;
                          block.onmouseup = null;
                          block.parentElement.style.zIndex = "unset";
-                         if (isInTrashCan(x, y))
+                         if ( isInTrashCan(x, y) ) {
+                              var linesList = [].slice.call( document.getElementsByClassName("line") );
+                              linesList = linesList.filter( function(line) {return line.textContent.includes(block.name)} );
+                              var connectors = [].slice.call( document.getElementsByClassName('con') );
+                              connectors = connectors.filter( function(connector) {return connector.textContent.includes(block.name)} );
+                              connectors.forEach( function(connector) { connector.name = "no-con"; } );
+                              linesList.forEach( function(line) {line.remove();} );
                               block.remove();
+                         }
                          document.getElementById("trash-can-wrapper").style.left = "-20vw";
                     };
 
@@ -173,7 +193,7 @@ function connect(connector) {
 
                document.onclick = function(e) {
                     if (e.target.name == 'no-con' && (connector.className != e.target.className) && (connector.parentElement.parentElement != e.target.parentElement.parentElement)) {
-                         line.textContent = connector.parentElement.parentElement.name + "-" + e.target.parentElement.parentElement.name;
+                         line.textContent = connector.textContent = e.target.textContent = connector.parentElement.parentElement.name + "-" + e.target.parentElement.parentElement.name;
                          e.target.name = 'con';
                          connector.name = 'con';
                          document.onmousemove = null;
