@@ -175,15 +175,16 @@ function updateLineElement(line, x1, y1, x2, y2) {
      line.setAttribute('style', styles);
 }
 
-function connect(connector) {
-     if (connector.name == 'no-con' && !isBusy) {
-          isBusy = true;
-          var conCoords = connector.getBoundingClientRect(),
+function connect(headConnector) {
+     if (startConnectingIsAvailable()) {
+          var conCoords = headConnector.getBoundingClientRect(),
               fieldMovableCoords = field.children[0].getBoundingClientRect(),
               x1 = conCoords.x - fieldMovableCoords.x + 5,
               y1 = conCoords.y - fieldMovableCoords.y + 5,
               line = createLineElement(x1, y1, x1, y1);
-          field.children[0].appendChild(line);
+
+          isBusy = true;
+          document.getElementById('field-movable').appendChild(line);
 
           document.onmousemove = function(e) {
                var x2 = e.pageX - fieldMovableCoords.x,
@@ -192,10 +193,16 @@ function connect(connector) {
                updateLineElement(line, x1, y1, x2, y2);
 
                document.onclick = function(e) {
-                    if (e.target.name == 'no-con' && (connector.className != e.target.className) && (connector.parentElement.parentElement != e.target.parentElement.parentElement)) {
-                         line.textContent = connector.textContent = e.target.textContent = connector.parentElement.parentElement.name + "-" + e.target.parentElement.parentElement.name;
-                         e.target.name = 'con';
-                         connector.name = 'con';
+                    var tailConnector = e.target;
+
+                    if (finishConnectingIsAvailable(tailConnector)) {
+                         line.textContent =
+                              getGrandParent(headConnector).name +
+                                   "-" + getGrandParent(tailConnector).name;
+                         headConnector.textContent =
+                              tailConnector.textContent = line.textContent;
+                         
+                         tailConnector.name = headConnector.name = 'con';
                          document.onmousemove = null;
                          document.onclick = null;
                          isBusy = false;
@@ -211,5 +218,37 @@ function connect(connector) {
                     }
                }
           };
+     }
+
+     function startConnectingIsAvailable() {
+          return !isConnected(headConnector) && !isBusy;
+     }
+
+     function finishConnectingIsAvailable(tailConnector) {
+          return isConnector(tailConnector) &&
+                    !isConnected(tailConnector) &&
+                         connectorsHaveDifferentTypes() &&
+                              !lieOnSameBlock();
+
+          function connectorsHaveDifferentTypes() {
+               return headConnector.className != tailConnector.className;
+          }
+
+          function lieOnSameBlock() {
+               return getGrandParent(headConnector) ==
+                    getGrandParent(tailConnector);
+          }
+     }
+
+     function isConnector(elem) {
+          return elem.className.includes('con');
+     }
+
+     function isConnected(connector) {
+          return connector.name == 'con';
+     }
+
+     function getGrandParent(elem) {
+          return elem.parentElement.parentElement;
      }
 }
