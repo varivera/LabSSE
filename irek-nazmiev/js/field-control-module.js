@@ -69,11 +69,11 @@ function moveBlock(block) {
                               if (line.item.textContent.split('-')[0] == block.name) {    // head is here
                                    var x1 = e.pageX + line.shiftX1,
                                        y1 = e.pageY + line.shiftY1;
-                                   updateLineElement(line.item, x1, y1, line.x2, line.y2)
+                                   updateLine(line.item, x1, y1, line.x2, line.y2)
                               } else {
                                    var x2 = e.pageX + line.shiftX2,
                                        y2 = e.pageY + line.shiftY2;
-                                   updateLineElement(line.item, line.x1, line.y1, x2, y2)
+                                   updateLine(line.item, line.x1, line.y1, x2, y2)
                               }
                          });
 
@@ -133,27 +133,15 @@ function moveField(block) {
      }
 }
 
-function createLineElement(x1, y1, x2, y2) {
-     var line = document.createElement("div");
-     var lineData = createLine(x1, y1, x2, y2);
-     var styles = 'width: ' + lineData.length + 'px; '
-                + 'transform: rotate(' + lineData.angle + 'rad); '
-                + 'top: ' + lineData.y + 'px; '
-                + 'left: ' + lineData.x + 'px;';
-     line.setAttribute('style', styles);
-     line.setAttribute('class', 'line');
-     return line;
-}
-
-function createLine(x1, y1, x2, y2) {
+function calculateLineData(x1, y1, x2, y2) {
      var a = x1 - x2,
          b = y1 - y2,
-         length = Math.sqrt(a * a + b * b);
+         length = Math.sqrt(a*a + b*b);
 
-     var sx = (x1 + x2) / 2,
-         sy = (y1 + y2) / 2;
+     var sx = (x1 + x2)/2,
+         sy = (y1 + y2)/2;
 
-     var x = sx - length / 2,
+     var x = sx - length/2,
          y = sy;
 
      var angle = Math.PI - Math.atan2(-b, a);
@@ -163,15 +151,25 @@ function createLine(x1, y1, x2, y2) {
           y: y,
           length: length,
           angle: angle
-     };
+     }
 }
 
-function updateLineElement(line, x1, y1, x2, y2) {
-     var lineData = createLine(x1, y1, x2, y2);
-     var styles = 'width: ' + lineData.length + 'px; '
+function createLine(x1, y1, x2, y2) {
+     var line = document.createElement("div");
+
+     updateLine(line, x1, y1, x2, y2);
+     line.setAttribute('class', 'line');
+
+     return line;
+}
+
+function updateLine(line, x1, y1, x2, y2) {
+     var lineData = calculateLineData(x1, y1, x2, y2),
+         styles = 'width: ' + lineData.length + 'px; '
                 + 'transform: rotate(' + lineData.angle + 'rad); '
                 + 'top: ' + lineData.y + 'px; '
                 + 'left: ' + lineData.x + 'px;';
+
      line.setAttribute('style', styles);
 }
 
@@ -181,7 +179,7 @@ function connect(headConnector) {
               fieldMovableCoords = field.children[0].getBoundingClientRect(),
               x1 = conCoords.x - fieldMovableCoords.x + 5,
               y1 = conCoords.y - fieldMovableCoords.y + 5,
-              line = createLineElement(x1, y1, x1, y1);
+              line = createLine(x1, y1, x1, y1);
 
           isBusy = true;
           document.getElementById('field-movable').appendChild(line);
@@ -190,7 +188,7 @@ function connect(headConnector) {
                var x2 = e.pageX - fieldMovableCoords.x,
                    y2 = e.pageY - fieldMovableCoords.y;
 
-               updateLineElement(line, x1, y1, x2, y2);
+               updateLine(line, x1, y1, x2, y2);
 
                document.onclick = function(e) {
                     var tailConnector = e.target;
@@ -201,7 +199,7 @@ function connect(headConnector) {
                                    "-" + getGrandParent(tailConnector).name;
                          headConnector.textContent =
                               tailConnector.textContent = line.textContent;
-                         
+
                          tailConnector.name = headConnector.name = 'con';
                          document.onmousemove = null;
                          document.onclick = null;
@@ -217,7 +215,7 @@ function connect(headConnector) {
                          isBusy = false;
                     }
                }
-          };
+          }
      }
 
      function startConnectingIsAvailable() {
