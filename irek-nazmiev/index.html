@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+     <head>
+          <meta charset="utf-8">
+          <meta http-equiv="Content-Type" content="text/html">
+          <meta name="keywords" content="Drag&Code, programming, scheme, diagram,
+          graph, coding, block, program">
+          <meta name="author" content="Irek Nazmiev">
+          <meta name="description" content="The main page of site Drag&Code allowing
+          to write a code by interacting with blocks visually and intuitively.
+          User can add the preset program blocks into the field, move and connect
+          them by lines representing inputs and outputs of the program blocks.">
+          <meta name="viewport" content="width=device-width, height=device-height,
+          initial-scale=1.0, user-scalable=yes">
+
+          <title>Drag&Code</title>
+
+          <link rel="icon" href="img/icon.png">
+          <link rel="stylesheet" href="css/style.css">
+
+          <script type="text/javascript" src="js/blocks-module.js"></script>
+          <script type="text/javascript" src="js/field-control-module.js"></script>
+
+          </script>
+     </head>
+
+     <body>
+          <header id="header">
+               <div id="tools" class="header-block">
+                    <button class="tool" type="button" name="add-input"></button>
+                    <button class="tool" type="button" name="add-output"></button>
+                    <button class="tool" type="button" name="remove-wire"></button>
+               </div>
+
+               <div id="logo" class="header-block">
+                    <div>Drag&Code</div>
+               </div>
+
+               <nav id="nav" class="header-block">
+                    <a class="nav-section" href="#">main</a>
+                    <a class="nav-section" href="#">profile</a>
+                    <a class="nav-section" href="#">log out</a>
+               </nav>
+          </header>
+
+          <aside id="block-panel">
+               <div id="block-panel-inside">
+                    <div id="in-out-block-group" class="block-group">
+                         <button class="block-group-title" onclick="openCloseSpoiler(this);" name="shown">Input/Output</button>
+                         <div class="block-group-wrapper">
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="input">input</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="output">output</button>
+                         </div>
+                    </div>
+
+                    <div id="math-block-group" class="block-group">
+                         <button class="block-group-title" onclick="openCloseSpoiler(this);" name="shown">Mathematical</button>
+                         <div class="block-group-wrapper">
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="add">add</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="sub">sub</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="mult">mult</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="div">div</button>
+                         </div>
+                    </div>
+
+                    <div id="string-block-group" class="block-group">
+                         <button class="block-group-title" onclick="openCloseSpoiler(this);" name="shown">String</button>
+                         <div class="block-group-wrapper">
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="replace">replace</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="is-substring">isSubstring</button>
+                              <button class="add-block-button" onclick="addBlock(this.textContent);" name="concatenate">concatenate</button>
+                         </div>
+                    </div>
+               </div>
+               <div id="trash-can-wrapper">
+                    <div id="trash-can">Delete block</div>
+               </div>
+               <button id="block-panel-hider" onclick="hideShowBlockPanel(this);" name="shown"></button>
+          </aside>
+
+          <section id="field" onmousemove="moveField();">
+               <div id="field-movable"></div>
+          </section>
+     </body>
+</html>

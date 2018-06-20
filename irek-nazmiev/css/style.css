@@ -1,0 +1,282 @@
+body {
+     margin: 0;
+     font-family: "Roboto", sans-serif;
+     color: black;
+}
+
+button {
+     padding: 0;
+     background-color: unset;
+     border: none;
+     display: block;
+}
+
+button:focus { outline: none; }
+
+button:hover { cursor: pointer; }
+
+a:visited {
+     color: black;
+}
+
+a:hover {
+     text-decoration: underline;
+}
+
+hr {
+     margin: 0;
+}
+
+div,
+button {
+     transition: box-shadow 0.3s ease 0s;
+}
+
+/*                                 H E A D E R                                */
+
+header {
+     background-color: #ff8800;
+     height: 7vh;
+     width: 100vw;
+     position: sticky;
+     top: 0;
+     left: 0;
+
+     display: flex;
+     z-index: 2;
+}
+
+.header-block {
+     height: 100%;
+}
+
+#tools {
+     width: 20vw;
+
+     display: flex;
+     align-items: center;
+     justify-content: flex-start;
+}
+
+.tool {
+     width: 5vh;
+     height: 5vh;
+     outline: 0.5vh solid black;
+     margin-left: 2vw;
+
+     display: flex;
+}
+
+#logo {
+     width: 35vw;
+     font-size: 4.5vh;
+     font-weight: 600;
+
+     display: flex;
+     justify-content: flex-end;
+     align-items: center;
+}
+
+#nav {
+     width: 45vw;
+     font-size: 2.5vh;
+     color: white;
+
+     display: flex;
+     justify-content: flex-end;
+     align-items: center;
+}
+
+.nav-section {
+     text-decoration: none;
+     font-weight: 500;
+     margin-right: 2vw;
+}
+
+/*                                 B L O C K - P A N E L                      */
+
+#block-panel {
+     width: 20vw;
+     height: 100vh;
+     background-color: white;
+
+     position: absolute;
+     left: 0;
+     top: 0;
+     z-index: 1;
+}
+
+#block-panel-hider {
+     height: 5vh;
+     width: 2vw;
+     background: white url(../img/left-arrow.png) left center no-repeat;
+     background-size: 80%;
+     border: 0.2vw solid black;
+     border-left: none;
+     border-radius: 0 50% 50% 0;
+
+     position: absolute;
+     right: -2vw;
+     top: 50vh;
+
+}
+
+#block-panel-inside {
+     height: 93%;
+     width: 100%;
+     margin-top: 7vh;
+     padding: 1.5vw;
+     box-sizing: border-box;
+     overflow: auto;
+     position: relative;
+}
+
+.block-group {
+     margin-bottom: 3.5vh;
+     outline: 0.4vh dotted rgba(0,0,0,0.1);
+}
+
+.block-group:last-child{
+     margin-bottom: 0;
+}
+
+.block-group-title {
+     width: 100%;
+     height: 4vh;
+     font-size: 2vh;
+     font-family: inherit;
+     font-weight: 500;
+     text-transform: uppercase;
+     letter-spacing: 0.2vw;
+     outline: 0.4vh solid black;
+}
+
+.block-group-title:focus {
+     outline: 0.4vh solid black;
+}
+
+.block-group-wrapper {
+     padding: 1vw;
+     padding-top: 0;
+}
+
+.add-block-button {
+     height: 10vh;
+     width: 100%;
+     font-family: inherit;
+     font-size: 2vw;
+     margin-top: 2vh;
+     transition: inherit;
+     box-shadow: 0 0 0.9vh 0.3vh rgba(0,0,0,0.2);
+}
+
+.add-block-button:hover {
+     box-shadow: 0 0 0.9vh 0.5vh rgba(0,0,0,0.2);
+}
+
+#trash-can-wrapper {
+     width: 100%;
+     height: 15vh;
+     background-color: white;
+     border-top: 0.7vh solid #dfdfdf;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 2vw;
+
+     position: absolute;
+     bottom: 0;
+     left: -20vw;
+}
+
+#trash-can {
+     border: 0.25vw dashed #FF4040;
+     padding: 2vh 2vw;
+     color: #FF4040;
+     opacity: 0.6;
+}
+
+#trash-can:hover {
+     opacity: 0.9;
+     cursor: pointer;
+}
+
+/*                                 F I E L D                                  */
+
+#field {
+     width: 100vw;
+     height: 93vh;
+     background-color: #dfdfdf;
+     overflow: hidden;
+     z-index: 0;
+}
+
+#field-movable {
+     height: 100px;
+     width: 100px;
+
+     position: fixed;
+     top: 50vh;
+     left: 50vw;
+}
+
+.block {
+     height: 80px;
+     width: 180px;
+     top: 0;
+     left: 0;
+     font-size: 25px;
+     box-shadow: 0 0 0.9vh 0.3vh rgba(0,0,0,0.2);
+     background-color: white;
+
+     position: absolute;
+     z-index: 1;
+}
+
+.connectors {
+     width: 20px;
+     height: inherit;
+
+     position: absolute;
+     top: 0;
+
+     display: flex;
+     flex-direction: column;
+     justify-content: space-around;
+     align-items: center;
+}
+
+.input-connectors {
+     left: -10px;
+}
+
+.output-connectors {
+     right: -10px;
+}
+
+.con {
+     width: 15px;
+     height: 15px;
+     border-radius: 50%;
+     font-size: 0;
+     z-index: 0;
+}
+
+.in-con {
+     background-color: white;
+     border: 2px solid black;
+}
+
+.out-con {
+     background-color: black;
+     border: 2px solid white;
+}
+
+.line {
+     height: 0px;
+     outline: 1px solid black;
+     background-color: black;
+     overflow: hidden;
+
+     position: absolute;
+}
