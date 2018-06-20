@@ -1,32 +1,51 @@
 var isBusy = false,
     maxId = 0;
 
+// move the block related to field-movable or delete it with all connected wires
 function moveBlock(block) {
      block.onmousedown = function(e) {       // start moving on first click
-          if (!isBusy && e.button == 0) {
-               var x, y;
-
-               var blockCoords = block.getBoundingClientRect(),
+          if (blockIsAvailable()) {
+               var x, y,
+                   blockCoords = block.getBoundingClientRect(),
                    shiftX = e.pageX - blockCoords.left,
-                   shiftY = e.pageY - blockCoords.top;
+                   shiftY = e.pageY - blockCoords.top,
+                   fieldMovable = document.getElementById('field-movable'),
+                   trashCanWrapper =
+                       document.getElementById("trash-can-wrapper"),
+                   linesList = findConnectedElems('line'),
+                   fieldMovableCoords = fieldMovable.getBoundingClientRect();
 
-               block.parentElement.style.zIndex = 1000;
-               document.getElementById("trash-can-wrapper").style.left = 0;
+               isBusy = true;
+               fieldMovable.style.zIndex = 1000;  // move block on foreground
+               trashCanWrapper.style.left = 0;    // show the trash can
 
-               var fieldMovableCoords = field.children[0].getBoundingClientRect();
-               var linesList = [].slice.call(document.getElementsByClassName("line"));
-               linesList = linesList.filter( function(line) {return line.textContent.includes(block.name)});
+               linesList.forEach(function(line) {
+                    var angle = +line.style.transform.slice(7, -4),
+                        lineCoords = findRightCoords(angle);
 
-               linesList.forEach( function(line) {
-                         var lineCoords = line.getBoundingClientRect(),
-                             angle = +line.style.transform.slice(7, -4);
+                    // change line element on object with its necessary data
+                    linesList[linesList.indexOf(line)] = {
+                         item: line,
+                         x1: lineCoords.x1,
+                         y1: lineCoords.y1,
+                         x2: lineCoords.x2,
+                         y2: lineCoords.y2,
+                         shiftX1: lineCoords.x1 - e.pageX,
+                         shiftY1: lineCoords.y1 - e.pageY,
+                         shiftX2: lineCoords.x2 - e.pageX,
+                         shiftY2: lineCoords.y2 - e.pageY,
+                    };
 
-                         if (angle >= 0 && angle <= Math.PI / 2) {
+                    // determine head and tail points and find theit coordinates
+                    function findRightCoords(angle) {
+                         var lineCoords = line.getBoundingClientRect();
+
+                         if (angle >= 0 && angle <= Math.PI/2) {
                               var x1 = lineCoords.x - fieldMovableCoords.x,
                                   y1 = lineCoords.y - fieldMovableCoords.y,
                                   x2 = lineCoords.right - fieldMovableCoords.x,
                                   y2 = lineCoords.bottom - fieldMovableCoords.y;
-                         } else if (angle > Math.PI / 2 && angle <= Math.PI) {
+                         } else if (angle > Math.PI/2 && angle <= Math.PI) {
                               var x1 = lineCoords.right - fieldMovableCoords.x,
                                   y1 = lineCoords.y - fieldMovableCoords.y,
                                   x2 = lineCoords.x - fieldMovableCoords.x,
@@ -43,29 +62,25 @@ function moveBlock(block) {
                                   y2 = lineCoords.y - fieldMovableCoords.y;
                          }
 
-                         linesList.splice(linesList.indexOf(line) + 1, 0, {
-                              item: line,
+                         return {
                               x1: x1,
                               y1: y1,
                               x2: x2,
-                              y2: y2,
-                              shiftX1: x1 - e.pageX,
-                              shiftY1: y1 - e.pageY,
-                              shiftX2: x2 - e.pageX,
-                              shiftY2: y2 - e.pageY,
-                         });
-
-                         linesList.splice(linesList.indexOf(line), 1);
+                              y2: y2
+                         };
+                    }
                });
 
-               document.onmousemove = function(e) {    // when mouse is moving, change block's coordinates
-                    var fieldMovableCoords = field.children[0].getBoundingClientRect();
+               // when mouse is moving, change block's coordinates
+               document.onmousemove = function(e) {
+                    block.style.left = e.pageX - shiftX
+                                     - fieldMovableCoords.left + 'px';
+                    block.style.top = e.pageY - shiftY
+                                    - fieldMovableCoords.top + 'px';
 
-                    block.style.left = e.pageX - shiftX - fieldMovableCoords.left + 'px';
-                    block.style.top = e.pageY - shiftY - fieldMovableCoords.top + 'px';
-
-                    linesList.forEach( function(line) {
-                         if (line.item.textContent.split('-')[0] == block.name) {    // head is here
+                    // update all lines connected to moving block
+                    linesList.forEach(function(line) {
+                         if (lineIsConnected()) {    // head is here
                               var x1 = e.pageX + line.shiftX1,
                                   y1 = e.pageY + line.shiftY1;
                               updateLine(line.item, x1, y1, line.x2, line.y2)
@@ -74,35 +89,65 @@ function moveBlock(block) {
                                   y2 = e.pageY + line.shiftY2;
                               updateLine(line.item, line.x1, line.y1, x2, y2)
                          }
+
+                         function lineIsConnected() {
+                              return line.item.textContent.split('-')[0]
+                                   == block.name;
+                         }
                     });
 
-                    x = e.pageX;
+                    x = e.pageX;   // save last cursor's coordinates
                     y = e.pageY;
-               };
+               }
 
-               block.onmouseup = function(e) {          // stop moving on second click
+               block.onmouseup = function(e) {   // stop moving on second click
                     document.onmousemove = null;
                     block.onmouseup = null;
-                    block.parentElement.style.zIndex = "unset";
-                    if ( isInTrashCan(x, y) ) {
-                         var linesList = [].slice.call( document.getElementsByClassName("line") );
-                         linesList = linesList.filter( function(line) {return line.textContent.includes(block.name)} );
-                         var connectors = [].slice.call( document.getElementsByClassName('con') );
-                         connectors = connectors.filter( function(connector) {return connector.textContent.includes(block.name)} );
-                         connectors.forEach( function(connector) { connector.name = "no-con"; } );
-                         linesList.forEach( function(line) {line.remove();} );
+                    fieldMovable.style.zIndex = "unset";
+
+                    if (isInTrashCan(x, y)) {
+                         var connectors = findConnectedElems('con');
+
+                         linesList.forEach(function(line) {
+                              line.item.remove();
+                         });
+                         connectors.forEach(function(connector) {
+                              connector.name = "no-con";
+                         });
+
                          block.remove();
                     }
-                    document.getElementById("trash-can-wrapper").style.left = "-20vw";
-               };
+
+                    trashCanWrapper.style.left = "-20vw";
+                    isBusy = false;
+               }
 
                function isInTrashCan(x, y){
-                    var trashCanCoords = document.getElementById("trash-can").getBoundingClientRect();
+                    var trashCan = document.getElementById('trash-can'),
+                        trashCanCoords = trashCan.getBoundingClientRect();
+
                     return x >= trashCanCoords.left &
                            x <= (trashCanCoords.left + trashCanCoords.width) &
                            y >= trashCanCoords.top &
                            y <= (trashCanCoords.top + trashCanCoords.height);
                }
+
+               function findConnectedElems(className) {
+                    var elemsList = document.getElementsByClassName(className);
+
+                    // HTMLcollection to array
+                    elemsList = [].slice.call(elemsList);
+                    // leave in the list only elems connected to block
+                    elemsList = elemsList.filter(function(elem) {
+                         return elem.textContent.includes(block.name)
+                    });
+
+                    return elemsList;
+               }
+          }
+
+          function blockIsAvailable() {
+               return !isBusy && e.button == 0;
           }
      }
 }
@@ -111,28 +156,31 @@ function moveBlock(block) {
 // moving the cursor. Actually we move hidden block and all the blocks inside
 // have coordinates related to this block and are also being moved
 function moveField() {
-     block.onmousedown = function(e) {
-          if (e.button == 2) {     // right-click button
-               var fieldMovable = document.getElementById('field-movable'),
-                   fieldMovableCoords = fieldMovable.getBoundingClientRect(),
-                   shiftX = e.pageX - fieldMovableCoords.left,
-                   shiftY = e.pageY - fieldMovableCoords.top;
+     var fieldMovable = document.getElementById('field-movable');
 
-               // change field-movable block's position
-               block.onmousemove = function(e) {
-                    fieldMovable.style.left = e.pageX - shiftX + 'px';
-                    fieldMovable.style.top = e.pageY - shiftY + 'px';
-               }
+     field.onmousedown = function(e) {
+          if (!isBusy) {
+               if (e.button == 2) {     // right-click button
+                    var fieldMovableCoords = fieldMovable.getBoundingClientRect(),
+                        shiftX = e.pageX - fieldMovableCoords.left,
+                        shiftY = e.pageY - fieldMovableCoords.top;
 
-               // stop moving
-               document.onmouseup = function() {
-                    block.onmousemove = null;
-                    document.onmouseup = null;
+                    // change field-movable block's position
+                    field.onmousemove = function(e) {
+                         fieldMovable.style.left = e.pageX - shiftX + 'px';
+                         fieldMovable.style.top = e.pageY - shiftY + 'px';
+                    }
+
+                    // stop moving
+                    document.onmouseup = function() {
+                         field.onmousemove = null;
+                         document.onmouseup = null;
+                    }
                }
           }
      }
 
-     block.oncontextmenu = function(e) {   // not to show the context menu
+     field.oncontextmenu = function(e) {   // not to show the context menu
           return false;                    // after pressing right-click button
      }
 }
@@ -157,7 +205,7 @@ function calculateLineData(x1, y1, x2, y2) {
           y: y,
           length: length,
           angle: angle
-     }
+     };
 }
 
 // return line element made by start and finish points
