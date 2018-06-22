@@ -113,6 +113,7 @@ function moveBlock(block) {
                          });
                          connectors.forEach(function(connector) {
                               connector.name = "no-con";
+                              connector.textContent = "";
                          });
 
                          block.remove();
