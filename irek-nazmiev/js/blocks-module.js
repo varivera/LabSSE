@@ -1,4 +1,6 @@
-var maxId = 0;
+var maxBlockId;
+
+mysqlUpdateMaxBlockId();
 
 function openCloseSpoiler(block) {
      if (block.name == "shown") {
@@ -27,16 +29,19 @@ function hideShowBlockPanel(block) {
 function addBlock(content) {
      var inputConnectors = '<button class="in-con con" onclick="connect(this);" name="no-con"></button>',
          outputConnectors = '<button class="out-con con" onclick="connect(this);" name="no-con"></button>';
+     var fieldMovable = document.getElementById('field-movable'),
+         fieldMovableCoords = fieldMovable.getBoundingClientRect();
      var block = document.createElement("button");
 
      block.className = "block";
-     block.name = maxId++;
      block.setAttribute("onmousemove", "moveBlock(this);");
-     var fieldMovable = document.getElementById('field-movable'),
-         fieldMovableCoords = fieldMovable.getBoundingClientRect();
-     console.log(-fieldMovableCoords.x + document.body.clientWidth);
-     block.style.left = -fieldMovableCoords.x + document.body.clientWidth/2 + 'px';
-     block.style.top = -fieldMovableCoords.y + document.body.clientHeight/2 + 'px';
+     block.style.left = -fieldMovableCoords.x +
+          document.body.clientWidth/2 + 'px';
+     block.style.top = -fieldMovableCoords.y +
+          document.body.clientHeight/2 + 'px';
+     block.name = ++maxBlockId;
+
+     mysqlAddBlock(content, block.style.left.slice(0, -2), block.style.top.slice(0, -2))
 
      if (content == 'input')
           inputConnectors = "";

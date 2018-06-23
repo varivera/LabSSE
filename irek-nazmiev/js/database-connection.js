@@ -1,20 +1,8 @@
-var mysqlQueryResult;
-
-// take the returning value from onreadystatechange function
-var saveResult = function(returnedData) {
-     mysqlQueryResult = returnedData;    // saving result into global variable
-}
-
-// perform the sql-query code
-function mysqlQuery(query, func) {
+function mysqlQuery(query, type, func) {      // perform the sql-query code
      var ajax = new XMLHttpRequest(),
          method = "GET",
-         url = "php/db.php?query=" + query,
+         url = "php/db.php?query=" + query + "&type=" + type,
          asynchronous = true;
-
-     if (!func) {
-          func = saveResult;
-     }
 
      ajax.open(method, url, asynchronous);
      ajax.send(null);
@@ -24,4 +12,17 @@ function mysqlQuery(query, func) {
                func(JSON.parse(ajax.responseText));
           }
      };
+}
+
+function mysqlAddBlock(content, x, y) {
+     var query = "INSERT INTO blocks(id, type, x, y) VALUES ('', '"
+          + content + "', '" + x + "', '" + y + "')";
+     mysqlQuery(query, "insert", function(result) {});
+}
+
+function mysqlUpdateMaxBlockId() {
+     var query = "SELECT MAX(id) FROM blocks";
+     mysqlQuery(query, "select", function(result) {
+          maxBlockId = +result[0][0];
+     })
 }
