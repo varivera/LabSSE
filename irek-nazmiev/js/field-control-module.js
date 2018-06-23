@@ -1,5 +1,4 @@
-var isBusy = false,
-    maxId = 0;
+var isBusy = false;
 
 // move the block related to field-movable or delete it with all connected wires
 function moveBlock(block) {

@@ -1,3 +1,5 @@
+var maxId = 0;
+
 function openCloseSpoiler(block) {
      if (block.name == "shown") {
           block.name = "hided";
@@ -30,6 +32,11 @@ function addBlock(content) {
      block.className = "block";
      block.name = maxId++;
      block.setAttribute("onmousemove", "moveBlock(this);");
+     var fieldMovable = document.getElementById('field-movable'),
+         fieldMovableCoords = fieldMovable.getBoundingClientRect();
+     console.log(-fieldMovableCoords.x + document.body.clientWidth);
+     block.style.left = -fieldMovableCoords.x + document.body.clientWidth/2 + 'px';
+     block.style.top = -fieldMovableCoords.y + document.body.clientHeight/2 + 'px';
 
      if (content == 'input')
           inputConnectors = "";
