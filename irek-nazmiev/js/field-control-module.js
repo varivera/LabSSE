@@ -120,6 +120,9 @@ function moveBlock(block) {
 
                     trashCanWrapper.style.left = "-20vw";
                     isBusy = false;
+
+                    mysqlUpdateBlock(block.name, x, y);
+                    console.log("DONE");
                }
 
                function isInTrashCan(x, y){

@@ -41,7 +41,8 @@ function addBlock(content) {
           document.body.clientHeight/2 + 'px';
      block.name = ++maxBlockId;
 
-     mysqlAddBlock(content, block.style.left.slice(0, -2), block.style.top.slice(0, -2))
+     mysqlAddBlock(content, block.style.left.slice(0, -2),
+          block.style.top.slice(0, -2))
 
      if (content == 'input')
           inputConnectors = "";
@@ -54,8 +55,9 @@ function addBlock(content) {
      else
           inputConnectors = inputConnectors.repeat(2);
 
-     block.innerHTML = content + '<div class="input-connectors connectors">' + inputConnectors
-                     + '</div><div class="output-connectors connectors">' + outputConnectors
-                     + '</div>';
+     block.innerHTML = content + '<div class="input-connectors connectors">'
+                     + inputConnectors
+                     + '</div><div class="output-connectors connectors">'
+                     + outputConnectors + '</div>';
      field.children[0].appendChild(block);
 }
