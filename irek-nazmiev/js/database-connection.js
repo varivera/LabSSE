@@ -20,15 +20,13 @@ function mysqlAddBlock(content, x, y) {
      mysqlQuery(query);
 }
 
-function mysqlUpdateMaxBlockId() {
-     var query = "SELECT MAX(id) FROM blocks";
-     mysqlQuery(query, function(result) {
-          maxBlockId = +result[0][0];
-     })
-}
-
 function mysqlUpdateBlock(id, x, y) {
      var query = "UPDATE blocks SET x='" + x + "', y='" + y
                + "' WHERE id='" + id + "'";
+     mysqlQuery(query);
+}
+
+function mysqlDeleteBlock(id) {
+     var query = "DELETE FROM blocks WHERE id=" + id;
      mysqlQuery(query);
 }
