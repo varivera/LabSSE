@@ -17,9 +17,6 @@ function addBlock(content) {
           document.body.clientHeight/2 + 'px';
      block.name = maxBlockId++;
 
-     mysqlAddBlock(content, block.style.left.slice(0, -2),
-          block.style.top.slice(0, -2))
-
      if (content == 'input')
           inputConnectors = "";
      else if (content == 'output')

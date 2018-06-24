@@ -104,8 +104,6 @@ function moveBlock(block) {
                     block.onmouseup = null;
                     fieldMovable.style.zIndex = "unset";
 
-                    mysqlUpdateBlock(block.name, x, y);
-
                     if (isInTrashCan(x, y)) {
                          var connectors = findConnectedElems('con');
 
@@ -117,7 +115,6 @@ function moveBlock(block) {
                               connector.textContent = "";
                          });
 
-                         mysqlDeleteBlock(block.name)
                          block.remove();
                     }
 
