@@ -232,55 +232,81 @@ function updateLine(line, x1, y1, x2, y2) {
 // create the line with starting coordinates on connector and draw it while
 // moving the cursor by updating its data depending on cursor's position
 function connect(headConnector) {
-     if (startConnectingIsAvailable()) {
-          var conCoords = headConnector.getBoundingClientRect(),
-              fieldMovable = document.getElementById('field-movable'),
-              fieldMovableCoords = fieldMovable.getBoundingClientRect();
-              x1 = conCoords.x - fieldMovableCoords.x + 5, // starting position
-              y1 = conCoords.y - fieldMovableCoords.y + 5, // on head connector
-              line = createLine(x1, y1, x1, y1);
+     headConnector.onclick =  function(e) {
+          if (startConnectingIsAvailable()) {
+               var conCoords = headConnector.getBoundingClientRect(),
+                   fieldMovable = document.getElementById('field-movable'),
+                   fieldMovableCoords = fieldMovable.getBoundingClientRect();
+                   x1 = conCoords.x - fieldMovableCoords.x + 5, // starting position
+                   y1 = conCoords.y - fieldMovableCoords.y + 5, // on head connector
+                   line = createLine(x1, y1, x1, y1);
 
-          isBusy = true;
-          fieldMovable.appendChild(line);    // create a line
+               isBusy = true;
+               fieldMovable.appendChild(line);    // create a line
 
-          // drawing the line while moving cursor (change line's data depending
-          // on starting point and cursor's coordinates)
-          document.onmousemove = function(e) {
-               var x2 = e.pageX - fieldMovableCoords.x,  // set up starting
-                   y2 = e.pageY - fieldMovableCoords.y;  // coordinates
+               // drawing the line while moving cursor (change line's data depending
+               // on starting point and cursor's coordinates)
+               document.onmousemove = function(e) {
+                    var x2 = e.pageX - fieldMovableCoords.x,  // set up starting
+                        y2 = e.pageY - fieldMovableCoords.y;  // coordinates
 
-               updateLine(line, x1, y1, x2, y2);
+                    updateLine(line, x1, y1, x2, y2);
 
-               // connect the line after clicking on necessary connector
-               document.onclick = function(e) {
-                    var tailConnector = e.target;
+                    // connect the line after clicking on necessary connector
+                    document.onclick = function(e) {
+                         var tailConnector = e.target;
 
-                    if (finishConnectingIsAvailable(tailConnector)) {
-                         // mark the line with its head and tail blocks' ids
-                         line.textContent =
-                              getGrandParent(headConnector).name +
-                                   "-" + getGrandParent(tailConnector).name;
-                         // mark connectors the same as connected line was
-                         headConnector.textContent =
-                              tailConnector.textContent = line.textContent;
+                         if (finishConnectingIsAvailable(tailConnector)) {
+                              // mark the line with its head and tail blocks' ids
+                              line.textContent =
+                                   getGrandParent(headConnector).name +
+                                        "-" + getGrandParent(tailConnector).name;
+                              // mark connectors the same as connected line was
+                              headConnector.textContent =
+                                   tailConnector.textContent = line.textContent;
 
-                         // mark connected connectors
-                         headConnector.name = tailConnector.name = 'con';
-                         document.onmousemove = null;
-                         document.onclick = null;
-                         isBusy = false;
+                              // mark connected connectors
+                              headConnector.name = tailConnector.name = 'con';
+                              document.onmousemove = null;
+                              document.onclick = null;
+                              isBusy = false;
+                         }
+                    }
+
+                    // cancel connecting by pressing right-click button
+                    document.oncontextmenu = function(e) {
+                         if (isBusy) {
+                              document.onmousemove = null;
+                              document.onclick = null;
+                              line.remove();
+                              isBusy = false;
+                         }
                     }
                }
+          }
+     }
 
-               // cancel connecting by pressing right-click button
-               document.oncontextmenu = function(e) {
-                    if (isBusy) {
-                         document.onmousemove = null;
-                         document.onclick = null;
-                         line.remove();
-                         isBusy = false;
-                    }
-               }
+     headConnector.oncontextmenu = function(e) {
+          if (headConnector.name == "con" && !isBusy) {
+               var connectionInfo = headConnector.textContent,
+                   linesList = findElemsByTextContent('line', connectionInfo),
+                   connectorsList = findElemsByTextContent('con', connectionInfo);
+
+               linesList[0].remove();
+               connectorsList.forEach(function(con) {
+                    con.name = "no-con";
+               });
+          }
+
+          function findElemsByTextContent(className, textContent) {
+               var elemsList = document.getElementsByClassName(className);
+
+               elemsList = [].slice.call(elemsList);
+               elemsList = elemsList.filter(function(elem) {
+                    return elem.textContent == textContent;
+               });
+
+               return elemsList;
           }
      }
 
@@ -305,7 +331,7 @@ function connect(headConnector) {
      }
 
      function isConnector(elem) {
-          return elem.className.includes('con');
+          return elem.className.includes('con ');
      }
 
      function isConnected(connector) {

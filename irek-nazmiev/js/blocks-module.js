@@ -2,9 +2,9 @@ var maxBlockId = 0;
 
 function addBlock(content) {
      var inputConnectors = '<button class="in-con con"'
-               + ' onclick="connect(this);" name="no-con"></button>',
+               + ' onmousemove="connect(this);" name="no-con"></button>',
          outputConnectors = '<button class="out-con con"'
-               +' onclick="connect(this);" name="no-con"></button>';
+               +' onmousemove="connect(this);" name="no-con"></button>';
      var fieldMovable = document.getElementById('field-movable'),
          fieldMovableCoords = fieldMovable.getBoundingClientRect();
      var block = document.createElement("button");
