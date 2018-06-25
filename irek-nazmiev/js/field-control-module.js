@@ -263,9 +263,6 @@ function connect(headConnector) {
                                    "-" + getGrandParent(tailConnector).name +
                                    "|" + headConnector.textContent +
                                    "-" + tailConnector.textContent;
-                              // mark connectors the same as connected line was
-                              headConnector.textContent =
-                                   tailConnector.textContent = line.textContent;
 
                               // mark connected connectors
                               headConnector.name = tailConnector.name = 'con';
