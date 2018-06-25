@@ -12,6 +12,7 @@ function moveBlock(block) {
                    trashCanWrapper =
                        document.getElementById("trash-can-wrapper"),
                    linesList = findConnectedLines(),
+                   connectors = findConnectedCons(linesList),
                    fieldMovableCoords = fieldMovable.getBoundingClientRect();
 
                isBusy = true;
@@ -105,8 +106,6 @@ function moveBlock(block) {
                     fieldMovable.style.zIndex = "unset";
 
                     if (isInTrashCan(x, y)) {
-                         var connectors = findConnectedCons();
-
                          linesList.forEach(function(line) {
                               line.item.remove();
                          });
@@ -140,24 +139,6 @@ function moveBlock(block) {
                     });
 
                     return linesList;
-               }
-
-               function findConnectedCons() {
-                    var consList = document.getElementsByClassName('con'),
-                        consIds = [];
-
-                    linesList.forEach(function(line) {
-                         conPairIds = line.item.textContent.split('|');
-                         consIds.push(conPairIds[0]);
-                         consIds.push(conPairIds[1]);
-                    });
-
-                    consList = [].slice.call(consList);
-                    consList = consList.filter(function(con) {
-                         return consIds.includes(con.textContent);
-                    });
-
-                    return consList;
                }
           }
 
@@ -300,25 +281,18 @@ function connect(headConnector) {
 
      headConnector.oncontextmenu = function(e) {
           if (headConnector.name == "con" && !isBusy) {
-               var connectionInfo = headConnector.textContent,
-                   linesList = findElemsByTextContent('line', connectionInfo),
-                   connectorsList = findElemsByTextContent('con', connectionInfo);
-
-               linesList[0].remove();
-               connectorsList.forEach(function(con) {
+               var linesList = document.getElementsByClassName('line');
+               linesList = [].slice.call(linesList);
+               linesList = linesList.filter(function(line) {
+                    return line.textContent.includes(headConnector.textContent);
+               });
+               consList = findConnectedCons(linesList);
+               linesList.forEach(function(line) {
+                    line.remove();
+               });
+               consList.forEach(function(con) {
                     con.name = "no-con";
                });
-          }
-
-          function findElemsByTextContent(className, textContent) {
-               var elemsList = document.getElementsByClassName(className);
-
-               elemsList = [].slice.call(elemsList);
-               elemsList = elemsList.filter(function(elem) {
-                    return elem.textContent == textContent;
-               });
-
-               return elemsList;
           }
      }
 
@@ -354,4 +328,22 @@ function connect(headConnector) {
      function getGrandParent(elem) {
           return elem.parentElement.parentElement;
      }
+}
+
+function findConnectedCons(linesList) {
+     var consList = document.getElementsByClassName('con'),
+         consIds = [];
+
+     linesList.forEach(function(line) {
+          conPairIds = line.textContent.split('|');
+          consIds.push(conPairIds[0]);
+          consIds.push(conPairIds[1]);
+     });
+
+     consList = [].slice.call(consList);
+     consList = consList.filter(function(con) {
+          return consIds.includes(con.textContent);
+     });
+
+     return consList;
 }
