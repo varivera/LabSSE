@@ -259,10 +259,8 @@ function connect(headConnector) {
                          if (finishConnectingIsAvailable(tailConnector)) {
                               // mark the line with its head and tail blocks' ids
                               line.textContent =
-                                   getGrandParent(headConnector).name +
-                                   "-" + getGrandParent(tailConnector).name +
-                                   "|" + headConnector.textContent +
-                                   "-" + tailConnector.textContent;
+                                   headConnector.textContent + "|"
+                                        + tailConnector.textContent;
 
                               // mark connected connectors
                               headConnector.name = tailConnector.name = 'con';

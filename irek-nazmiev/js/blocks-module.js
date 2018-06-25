@@ -10,32 +10,35 @@ function addBlock(content) {
      var inputCons = createConWrapper("input"),
          outputCons = createConWrapper("output");
 
-     if (content == 'input') {
-          outputCons.appendChild(outputConnector);
-     } else if (content == 'output') {
-          inputCons.appendChild(inputConnector);
-     } else if (content == 'isSubstring') {
-          inputCons.appendChild(inputConnector);
-          outputCons.appendChild(outputConnector);
-     } else if (content == 'replace') {
-          appendChildren(inputCons, inputConnector, 3);
-          outputCons.appendChild(outputConnector);
-     } else {
-          appendChildren(inputCons, inputConnector, 2);
-          outputCons.appendChild(outputConnector);
-     }
-
      var block = createBlock();
+
+     var maxConId = 0;
+
+     if (content == 'input') {
+          appendChildren(0, 1);
+     } else if (content == 'output') {
+          appendChildren(1, 0);
+     } else if (content == 'isSubstring') {
+          appendChildren(1, 1);
+     } else if (content == 'replace') {
+          appendChildren(3, 1);
+     } else {
+          appendChildren(2, 1);
+     }
 
      fieldMovable.appendChild(block);
 
-     function appendChildren(parent, child, amount) {
-          var kid;
+     function appendChildren(inConAmount, outConAmount) {
 
-          for (i = 0; i < amount; i++) {
-               kid = child.cloneNode();
-               kid.textContent = i;
-               parent.appendChild(kid);
+          fillConWrapper(inputCons, inputConnector, inConAmount);
+          fillConWrapper(outputCons, outputConnector, outConAmount);
+
+          function fillConWrapper(conWrapper, connectorType, conAmount) {
+               for (i = 0; i < conAmount; i++) {
+                    var conClone = connectorType.cloneNode();
+                    conClone.textContent = block.name + "-" + maxConId++;
+                    conWrapper.appendChild(conClone);
+               }
           }
      }
 
@@ -51,7 +54,6 @@ function addBlock(content) {
 
           connector.setAttribute("onmousemove", "connect(this);");
           connector.name = "no-con";
-          connector.textContent = "0";
 
           return connector;
      }
