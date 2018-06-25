@@ -11,7 +11,7 @@ function moveBlock(block) {
                    fieldMovable = document.getElementById('field-movable'),
                    trashCanWrapper =
                        document.getElementById("trash-can-wrapper"),
-                   linesList = findConnectedElems('line'),
+                   linesList = findConnectedLines(),
                    fieldMovableCoords = fieldMovable.getBoundingClientRect();
 
                isBusy = true;
@@ -105,14 +105,13 @@ function moveBlock(block) {
                     fieldMovable.style.zIndex = "unset";
 
                     if (isInTrashCan(x, y)) {
-                         var connectors = findConnectedElems('con');
+                         var connectors = findConnectedCons();
 
                          linesList.forEach(function(line) {
                               line.item.remove();
                          });
                          connectors.forEach(function(connector) {
                               connector.name = "no-con";
-                              connector.textContent = "";
                          });
 
                          block.remove();
@@ -132,17 +131,33 @@ function moveBlock(block) {
                            y <= (trashCanCoords.top + trashCanCoords.height);
                }
 
-               function findConnectedElems(className) {
-                    var elemsList = document.getElementsByClassName(className);
+               function findConnectedLines() {
+                    var linesList = document.getElementsByClassName('line');
 
-                    // HTMLcollection to array
-                    elemsList = [].slice.call(elemsList);
-                    // leave in the list only elems connected to block
-                    elemsList = elemsList.filter(function(elem) {
-                         return elem.textContent.includes(block.name)
+                    linesList = [].slice.call(linesList);
+                    linesList = linesList.filter(function(line) {
+                         return line.textContent.includes(block.name + "-");
                     });
 
-                    return elemsList;
+                    return linesList;
+               }
+
+               function findConnectedCons() {
+                    var consList = document.getElementsByClassName('con'),
+                        consIds = [];
+
+                    linesList.forEach(function(line) {
+                         conPairIds = line.item.textContent.split('|');
+                         consIds.push(conPairIds[0]);
+                         consIds.push(conPairIds[1]);
+                    });
+
+                    consList = [].slice.call(consList);
+                    consList = consList.filter(function(con) {
+                         return consIds.includes(con.textContent);
+                    });
+
+                    return consList;
                }
           }
 
