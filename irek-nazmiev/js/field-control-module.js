@@ -260,7 +260,9 @@ function connect(headConnector) {
                               // mark the line with its head and tail blocks' ids
                               line.textContent =
                                    getGrandParent(headConnector).name +
-                                        "-" + getGrandParent(tailConnector).name;
+                                   "-" + getGrandParent(tailConnector).name +
+                                   "|" + headConnector.textContent +
+                                   "-" + tailConnector.textContent;
                               // mark connectors the same as connected line was
                               headConnector.textContent =
                                    tailConnector.textContent = line.textContent;
@@ -311,7 +313,8 @@ function connect(headConnector) {
      }
 
      function startConnectingIsAvailable() {
-          return !isConnected(headConnector) && !isBusy;
+          return (!isConnected(headConnector) ||
+               headConnector.className == "out-con con") && !isBusy;
      }
 
      function finishConnectingIsAvailable(tailConnector) {
