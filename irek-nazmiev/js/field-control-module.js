@@ -303,7 +303,7 @@ function connect(headConnector) {
 
      function finishConnectingIsAvailable(tailConnector) {
           return isConnector(tailConnector) &&
-                    !isConnected(tailConnector) &&
+                    (!isConnected(tailConnector) || tailConnector.className == "out-con con") &&
                          connectorsHaveDifferentTypes() &&
                               !lieOnSameBlock();
 
