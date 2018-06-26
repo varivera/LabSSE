@@ -95,9 +95,6 @@ function moveBlock(block) {
                                    == block.name;
                          }
                     });
-
-                    x = e.pageX;   // save last cursor's coordinates
-                    y = e.pageY;
                }
 
                block.onmouseup = function(e) {   // stop moving when end holding left click btn
@@ -105,7 +102,7 @@ function moveBlock(block) {
                     block.onmouseup = null;
                     fieldMovable.style.zIndex = "unset";
 
-                    if (isInTrashCan(x, y)) {
+                    if (isInTrashCan(e.pageX, e.pageY)) {
                          linesList.forEach(function(line) {
                               line.item.remove();
                          });
@@ -116,10 +113,11 @@ function moveBlock(block) {
                          block.remove();
                     }
 
-                    trashCanWrapper.style.left = "-20vw";
+                    trashCanWrapper.style.left = "-20vw";   // return trash can back
                     isBusy = false;
                }
 
+               // checks whether coordinates are on trash-can block area
                function isInTrashCan(x, y){
                     var trashCan = document.getElementById('trash-can'),
                         trashCanCoords = trashCan.getBoundingClientRect();
@@ -128,17 +126,6 @@ function moveBlock(block) {
                            x <= (trashCanCoords.left + trashCanCoords.width) &
                            y >= trashCanCoords.top &
                            y <= (trashCanCoords.top + trashCanCoords.height);
-               }
-
-               function findConnectedLines(block) {
-                    var linesList = document.getElementsByClassName('line');
-
-                    linesList = [].slice.call(linesList);
-                    linesList = linesList.filter(function(line) {
-                         return line.textContent.includes(block.name + "-");
-                    });
-
-                    return linesList;
                }
           }
 
@@ -281,16 +268,13 @@ function connect(headConnector) {
 
      headConnector.oncontextmenu = function(e) {
           if (headConnector.name == "con" && !isBusy) {
-               var linesList = document.getElementsByClassName('line');
-               linesList = [].slice.call(linesList);
-               linesList = linesList.filter(function(line) {
-                    return line.textContent.includes(headConnector.textContent);
-               });
-               consList = findConnectedCons(linesList);
-               linesList.forEach(function(line) {
+               var linesList = findConnectedLines(headConnector),
+                   consList = findConnectedCons(linesList);
+
+               linesList.forEach(function(line) { // remove all lines connected to connector
                     line.remove();
                });
-               consList.forEach(function(con) {
+               consList.forEach(function(con) { // label all used cons as "no-con"
                     con.name = "no-con";
                });
           }
@@ -331,12 +315,34 @@ function connect(headConnector) {
      }
 }
 
+// find lines connected to block or connector
+function findConnectedLines(elem) {
+     var linesList = document.getElementsByClassName('line'),
+         contentId;
+
+     if (elem.className == 'block')
+          contentId = elem.name + "-";
+     else if (elem.className.includes("con "))
+          contentId = elem.textContent;
+     else
+          alert("ERROR! Wrong type of an argument! It must be block or connector!");
+
+     linesList = [].slice.call(linesList);
+     linesList = linesList.filter(function(line) {
+          return line.textContent.includes(contentId);
+     });
+
+     return linesList;
+}
+
+// find connectors used in connecting given in LinesList lines
 function findConnectedCons(linesList) {
      var consList = document.getElementsByClassName('con'),
          consIds = [];
 
+     // fill the list of connectors' ids used in each line
      linesList.forEach(function(line) {
-          conPairIds = line.textContent.split('|');
+          var conPairIds = line.textContent.split('|');
           consIds.push(conPairIds[0], conPairIds[1]);
      });
 
