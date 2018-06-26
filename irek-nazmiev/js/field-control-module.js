@@ -2,18 +2,18 @@ var isBusy = false;
 
 // move the block related to field-movable or delete it with all connected wires
 function moveBlock(block) {
-     block.onmousedown = function(e) {       // start moving on first click
+     block.onmousedown = function(e) {       // start moving when holding left click btn
           if (blockIsAvailable()) {
                var x, y,
                    blockCoords = block.getBoundingClientRect(),
                    shiftX = e.pageX - blockCoords.left,
                    shiftY = e.pageY - blockCoords.top,
                    fieldMovable = document.getElementById('field-movable'),
+                   fieldMovableCoords = fieldMovable.getBoundingClientRect(),
                    trashCanWrapper =
                        document.getElementById("trash-can-wrapper"),
-                   linesList = findConnectedLines(),
-                   connectors = findConnectedCons(linesList),
-                   fieldMovableCoords = fieldMovable.getBoundingClientRect();
+                   linesList = findConnectedLines(block),
+                   connectors = findConnectedCons(linesList);
 
                isBusy = true;
                fieldMovable.style.zIndex = 1000;  // move block on foreground
@@ -80,17 +80,17 @@ function moveBlock(block) {
 
                     // update all lines connected to moving block
                     linesList.forEach(function(line) {
-                         if (lineIsConnected()) {    // head is here
+                         if (headConIsOnBlock(line, block)) {    // head is here
                               var x1 = e.pageX + line.shiftX1,
                                   y1 = e.pageY + line.shiftY1;
-                              updateLine(line.item, x1, y1, line.x2, line.y2)
+                              updateLine(line.item, x1, y1, line.x2, line.y2);
                          } else {
                               var x2 = e.pageX + line.shiftX2,
                                   y2 = e.pageY + line.shiftY2;
-                              updateLine(line.item, line.x1, line.y1, x2, y2)
+                              updateLine(line.item, line.x1, line.y1, x2, y2);
                          }
 
-                         function lineIsConnected() {
+                         function headConIsOnBlock(line, block) {
                               return line.item.textContent.split('-')[0]
                                    == block.name;
                          }
@@ -100,7 +100,7 @@ function moveBlock(block) {
                     y = e.pageY;
                }
 
-               block.onmouseup = function(e) {   // stop moving on second click
+               block.onmouseup = function(e) {   // stop moving when end holding left click btn
                     document.onmousemove = null;
                     block.onmouseup = null;
                     fieldMovable.style.zIndex = "unset";
@@ -130,7 +130,7 @@ function moveBlock(block) {
                            y <= (trashCanCoords.top + trashCanCoords.height);
                }
 
-               function findConnectedLines() {
+               function findConnectedLines(block) {
                     var linesList = document.getElementsByClassName('line');
 
                     linesList = [].slice.call(linesList);
@@ -336,8 +336,7 @@ function findConnectedCons(linesList) {
 
      linesList.forEach(function(line) {
           conPairIds = line.textContent.split('|');
-          consIds.push(conPairIds[0]);
-          consIds.push(conPairIds[1]);
+          consIds.push(conPairIds[0], conPairIds[1]);
      });
 
      consList = [].slice.call(consList);
