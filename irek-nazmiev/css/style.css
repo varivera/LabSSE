@@ -50,25 +50,8 @@ header {
      height: 100%;
 }
 
-#tools {
-     width: 20vw;
-
-     display: flex;
-     align-items: center;
-     justify-content: flex-start;
-}
-
-.tool {
-     width: 5vh;
-     height: 5vh;
-     outline: 0.5vh solid black;
-     margin-left: 2vw;
-
-     display: flex;
-}
-
 #logo {
-     width: 35vw;
+     width: 55vw;
      font-size: 4.5vh;
      font-weight: 600;
 

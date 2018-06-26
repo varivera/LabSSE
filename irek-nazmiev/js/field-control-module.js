@@ -2,17 +2,18 @@ var isBusy = false;
 
 // move the block related to field-movable or delete it with all connected wires
 function moveBlock(block) {
-     block.onmousedown = function(e) {       // start moving on first click
+     block.onmousedown = function(e) {       // start moving when holding left click btn
           if (blockIsAvailable()) {
                var x, y,
                    blockCoords = block.getBoundingClientRect(),
                    shiftX = e.pageX - blockCoords.left,
                    shiftY = e.pageY - blockCoords.top,
                    fieldMovable = document.getElementById('field-movable'),
+                   fieldMovableCoords = fieldMovable.getBoundingClientRect(),
                    trashCanWrapper =
                        document.getElementById("trash-can-wrapper"),
-                   linesList = findConnectedElems('line'),
-                   fieldMovableCoords = fieldMovable.getBoundingClientRect();
+                   linesList = findConnectedLines(block),
+                   connectors = findConnectedCons(linesList);
 
                isBusy = true;
                fieldMovable.style.zIndex = 1000;  // move block on foreground
@@ -79,17 +80,17 @@ function moveBlock(block) {
 
                     // update all lines connected to moving block
                     linesList.forEach(function(line) {
-                         if (lineIsConnected()) {    // head is here
+                         if (headConIsOnBlock(line, block)) {    // head is here
                               var x1 = e.pageX + line.shiftX1,
                                   y1 = e.pageY + line.shiftY1;
-                              updateLine(line.item, x1, y1, line.x2, line.y2)
+                              updateLine(line.item, x1, y1, line.x2, line.y2);
                          } else {
                               var x2 = e.pageX + line.shiftX2,
                                   y2 = e.pageY + line.shiftY2;
-                              updateLine(line.item, line.x1, line.y1, x2, y2)
+                              updateLine(line.item, line.x1, line.y1, x2, y2);
                          }
 
-                         function lineIsConnected() {
+                         function headConIsOnBlock(line, block) {
                               return line.item.textContent.split('-')[0]
                                    == block.name;
                          }
@@ -99,20 +100,17 @@ function moveBlock(block) {
                     y = e.pageY;
                }
 
-               block.onmouseup = function(e) {   // stop moving on second click
+               block.onmouseup = function(e) {   // stop moving when end holding left click btn
                     document.onmousemove = null;
                     block.onmouseup = null;
                     fieldMovable.style.zIndex = "unset";
 
                     if (isInTrashCan(x, y)) {
-                         var connectors = findConnectedElems('con');
-
                          linesList.forEach(function(line) {
                               line.item.remove();
                          });
                          connectors.forEach(function(connector) {
                               connector.name = "no-con";
-                              connector.textContent = "";
                          });
 
                          block.remove();
@@ -132,17 +130,15 @@ function moveBlock(block) {
                            y <= (trashCanCoords.top + trashCanCoords.height);
                }
 
-               function findConnectedElems(className) {
-                    var elemsList = document.getElementsByClassName(className);
+               function findConnectedLines(block) {
+                    var linesList = document.getElementsByClassName('line');
 
-                    // HTMLcollection to array
-                    elemsList = [].slice.call(elemsList);
-                    // leave in the list only elems connected to block
-                    elemsList = elemsList.filter(function(elem) {
-                         return elem.textContent.includes(block.name)
+                    linesList = [].slice.call(linesList);
+                    linesList = linesList.filter(function(line) {
+                         return line.textContent.includes(block.name + "-");
                     });
 
-                    return elemsList;
+                    return linesList;
                }
           }
 
@@ -259,11 +255,8 @@ function connect(headConnector) {
                          if (finishConnectingIsAvailable(tailConnector)) {
                               // mark the line with its head and tail blocks' ids
                               line.textContent =
-                                   getGrandParent(headConnector).name +
-                                        "-" + getGrandParent(tailConnector).name;
-                              // mark connectors the same as connected line was
-                              headConnector.textContent =
-                                   tailConnector.textContent = line.textContent;
+                                   headConnector.textContent + "|"
+                                        + tailConnector.textContent;
 
                               // mark connected connectors
                               headConnector.name = tailConnector.name = 'con';
@@ -288,37 +281,32 @@ function connect(headConnector) {
 
      headConnector.oncontextmenu = function(e) {
           if (headConnector.name == "con" && !isBusy) {
-               var connectionInfo = headConnector.textContent,
-                   linesList = findElemsByTextContent('line', connectionInfo),
-                   connectorsList = findElemsByTextContent('con', connectionInfo);
-
-               linesList[0].remove();
-               connectorsList.forEach(function(con) {
+               var linesList = document.getElementsByClassName('line');
+               linesList = [].slice.call(linesList);
+               linesList = linesList.filter(function(line) {
+                    return line.textContent.includes(headConnector.textContent);
+               });
+               consList = findConnectedCons(linesList);
+               linesList.forEach(function(line) {
+                    line.remove();
+               });
+               consList.forEach(function(con) {
                     con.name = "no-con";
                });
-          }
-
-          function findElemsByTextContent(className, textContent) {
-               var elemsList = document.getElementsByClassName(className);
-
-               elemsList = [].slice.call(elemsList);
-               elemsList = elemsList.filter(function(elem) {
-                    return elem.textContent == textContent;
-               });
-
-               return elemsList;
           }
      }
 
      function startConnectingIsAvailable() {
-          return !isConnected(headConnector) && !isBusy;
+          return (!isConnected(headConnector) ||
+               headConnector.className == "out-con con") && !isBusy;
      }
 
      function finishConnectingIsAvailable(tailConnector) {
           return isConnector(tailConnector) &&
-                    !isConnected(tailConnector) &&
-                         connectorsHaveDifferentTypes() &&
-                              !lieOnSameBlock();
+                    (!isConnected(tailConnector) ||
+                         tailConnector.className == "out-con con") &&
+                              connectorsHaveDifferentTypes() &&
+                                   !lieOnSameBlock();
 
           function connectorsHaveDifferentTypes() {
                return headConnector.className != tailConnector.className;
@@ -341,4 +329,21 @@ function connect(headConnector) {
      function getGrandParent(elem) {
           return elem.parentElement.parentElement;
      }
+}
+
+function findConnectedCons(linesList) {
+     var consList = document.getElementsByClassName('con'),
+         consIds = [];
+
+     linesList.forEach(function(line) {
+          conPairIds = line.textContent.split('|');
+          consIds.push(conPairIds[0], conPairIds[1]);
+     });
+
+     consList = [].slice.call(consList);
+     consList = consList.filter(function(con) {
+          return consIds.includes(con.textContent);
+     });
+
+     return consList;
 }
