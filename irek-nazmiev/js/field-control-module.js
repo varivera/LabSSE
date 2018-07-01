@@ -2,17 +2,18 @@ var isBusy = false;
 
 // move the block related to field-movable or delete it with all connected wires
 function moveBlock(block) {
-     block.onmousedown = function(e) {       // start moving on first click
+     block.onmousedown = function(e) {       // start moving when holding left click btn
           if (blockIsAvailable()) {
                var x, y,
                    blockCoords = block.getBoundingClientRect(),
                    shiftX = e.pageX - blockCoords.left,
                    shiftY = e.pageY - blockCoords.top,
                    fieldMovable = document.getElementById('field-movable'),
+                   fieldMovableCoords = fieldMovable.getBoundingClientRect(),
                    trashCanWrapper =
                        document.getElementById("trash-can-wrapper"),
-                   linesList = findConnectedElems('line'),
-                   fieldMovableCoords = fieldMovable.getBoundingClientRect();
+                   linesList = findConnectedLines(block),
+                   connectors = findConnectedCons(linesList);
 
                isBusy = true;
                fieldMovable.style.zIndex = 1000;  // move block on foreground
@@ -79,49 +80,44 @@ function moveBlock(block) {
 
                     // update all lines connected to moving block
                     linesList.forEach(function(line) {
-                         if (lineIsConnected()) {    // head is here
+                         if (headConIsOnBlock(line, block)) {    // head is here
                               var x1 = e.pageX + line.shiftX1,
                                   y1 = e.pageY + line.shiftY1;
-                              updateLine(line.item, x1, y1, line.x2, line.y2)
+                              updateLine(line.item, x1, y1, line.x2, line.y2);
                          } else {
                               var x2 = e.pageX + line.shiftX2,
                                   y2 = e.pageY + line.shiftY2;
-                              updateLine(line.item, line.x1, line.y1, x2, y2)
+                              updateLine(line.item, line.x1, line.y1, x2, y2);
                          }
 
-                         function lineIsConnected() {
+                         function headConIsOnBlock(line, block) {
                               return line.item.textContent.split('-')[0]
                                    == block.name;
                          }
                     });
-
-                    x = e.pageX;   // save last cursor's coordinates
-                    y = e.pageY;
                }
 
-               block.onmouseup = function(e) {   // stop moving on second click
+               block.onmouseup = function(e) {   // stop moving when end holding left click btn
                     document.onmousemove = null;
                     block.onmouseup = null;
                     fieldMovable.style.zIndex = "unset";
 
-                    if (isInTrashCan(x, y)) {
-                         var connectors = findConnectedElems('con');
-
+                    if (isInTrashCan(e.pageX, e.pageY)) {
                          linesList.forEach(function(line) {
                               line.item.remove();
                          });
                          connectors.forEach(function(connector) {
                               connector.name = "no-con";
-                              connector.textContent = "";
                          });
 
                          block.remove();
                     }
 
-                    trashCanWrapper.style.left = "-20vw";
+                    trashCanWrapper.style.left = "-20vw";   // return trash can back
                     isBusy = false;
                }
 
+               // checks whether coordinates are on trash-can block area
                function isInTrashCan(x, y){
                     var trashCan = document.getElementById('trash-can'),
                         trashCanCoords = trashCan.getBoundingClientRect();
@@ -130,19 +126,6 @@ function moveBlock(block) {
                            x <= (trashCanCoords.left + trashCanCoords.width) &
                            y >= trashCanCoords.top &
                            y <= (trashCanCoords.top + trashCanCoords.height);
-               }
-
-               function findConnectedElems(className) {
-                    var elemsList = document.getElementsByClassName(className);
-
-                    // HTMLcollection to array
-                    elemsList = [].slice.call(elemsList);
-                    // leave in the list only elems connected to block
-                    elemsList = elemsList.filter(function(elem) {
-                         return elem.textContent.includes(block.name)
-                    });
-
-                    return elemsList;
                }
           }
 
@@ -232,67 +215,82 @@ function updateLine(line, x1, y1, x2, y2) {
 // create the line with starting coordinates on connector and draw it while
 // moving the cursor by updating its data depending on cursor's position
 function connect(headConnector) {
-     if (startConnectingIsAvailable()) {
-          var conCoords = headConnector.getBoundingClientRect(),
-              fieldMovable = document.getElementById('field-movable'),
-              fieldMovableCoords = fieldMovable.getBoundingClientRect();
-              x1 = conCoords.x - fieldMovableCoords.x + 5, // starting position
-              y1 = conCoords.y - fieldMovableCoords.y + 5, // on head connector
-              line = createLine(x1, y1, x1, y1);
+     headConnector.onclick =  function(e) {
+          if (startConnectingIsAvailable()) {
+               var conCoords = headConnector.getBoundingClientRect(),
+                   fieldMovable = document.getElementById('field-movable'),
+                   fieldMovableCoords = fieldMovable.getBoundingClientRect();
+                   x1 = conCoords.x - fieldMovableCoords.x + 5, // starting position
+                   y1 = conCoords.y - fieldMovableCoords.y + 5, // on head connector
+                   line = createLine(x1, y1, x1, y1);
 
-          isBusy = true;
-          fieldMovable.appendChild(line);    // create a line
+               isBusy = true;
+               fieldMovable.appendChild(line);    // create a line
 
-          // drawing the line while moving cursor (change line's data depending
-          // on starting point and cursor's coordinates)
-          document.onmousemove = function(e) {
-               var x2 = e.pageX - fieldMovableCoords.x,  // set up starting
-                   y2 = e.pageY - fieldMovableCoords.y;  // coordinates
+               // drawing the line while moving cursor (change line's data depending
+               // on starting point and cursor's coordinates)
+               document.onmousemove = function(e) {
+                    var x2 = e.pageX - fieldMovableCoords.x,  // set up starting
+                        y2 = e.pageY - fieldMovableCoords.y;  // coordinates
 
-               updateLine(line, x1, y1, x2, y2);
+                    updateLine(line, x1, y1, x2, y2);
 
-               // connect the line after clicking on necessary connector
-               document.onclick = function(e) {
-                    var tailConnector = e.target;
+                    // connect the line after clicking on necessary connector
+                    document.onclick = function(e) {
+                         var tailConnector = e.target;
 
-                    if (finishConnectingIsAvailable(tailConnector)) {
-                         // mark the line with its head and tail blocks' ids
-                         line.textContent =
-                              getGrandParent(headConnector).name +
-                                   "-" + getGrandParent(tailConnector).name;
-                         // mark connectors the same as connected line was
-                         headConnector.textContent =
-                              tailConnector.textContent = line.textContent;
+                         if (finishConnectingIsAvailable(tailConnector)) {
+                              // mark the line with its head and tail blocks' ids
+                              line.textContent =
+                                   headConnector.textContent + "|"
+                                        + tailConnector.textContent;
 
-                         // mark connected connectors
-                         headConnector.name = tailConnector.name = 'con';
-                         document.onmousemove = null;
-                         document.onclick = null;
-                         isBusy = false;
+                              // mark connected connectors
+                              headConnector.name = tailConnector.name = 'con';
+                              document.onmousemove = null;
+                              document.onclick = null;
+                              isBusy = false;
+                         }
                     }
-               }
 
-               // cancel connecting by pressing right-click button
-               document.oncontextmenu = function(e) {
-                    if (isBusy) {
-                         document.onmousemove = null;
-                         document.onclick = null;
-                         line.remove();
-                         isBusy = false;
+                    // cancel connecting by pressing right-click button
+                    document.oncontextmenu = function(e) {
+                         if (isBusy) {
+                              document.onmousemove = null;
+                              document.onclick = null;
+                              line.remove();
+                              isBusy = false;
+                         }
                     }
                }
           }
      }
 
+     headConnector.oncontextmenu = function(e) {
+          if (headConnector.name == "con" && !isBusy) {
+               var linesList = findConnectedLines(headConnector),
+                   consList = findConnectedCons(linesList);
+
+               linesList.forEach(function(line) { // remove all lines connected to connector
+                    line.remove();
+               });
+               consList.forEach(function(con) { // label all used cons as "no-con"
+                    con.name = "no-con";
+               });
+          }
+     }
+
      function startConnectingIsAvailable() {
-          return !isConnected(headConnector) && !isBusy;
+          return (!isConnected(headConnector) ||
+               headConnector.className == "out-con con") && !isBusy;
      }
 
      function finishConnectingIsAvailable(tailConnector) {
           return isConnector(tailConnector) &&
-                    !isConnected(tailConnector) &&
-                         connectorsHaveDifferentTypes() &&
-                              !lieOnSameBlock();
+                    (!isConnected(tailConnector) ||
+                         tailConnector.className == "out-con con") &&
+                              connectorsHaveDifferentTypes() &&
+                                   !lieOnSameBlock();
 
           function connectorsHaveDifferentTypes() {
                return headConnector.className != tailConnector.className;
@@ -305,7 +303,7 @@ function connect(headConnector) {
      }
 
      function isConnector(elem) {
-          return elem.className.includes('con');
+          return elem.className.includes('con ');
      }
 
      function isConnected(connector) {
@@ -315,4 +313,43 @@ function connect(headConnector) {
      function getGrandParent(elem) {
           return elem.parentElement.parentElement;
      }
+}
+
+// find lines connected to block or connector
+function findConnectedLines(elem) {
+     var linesList = document.getElementsByClassName('line'),
+         contentId;
+
+     if (elem.className == 'block')
+          contentId = elem.name + "-";
+     else if (elem.className.includes("con "))
+          contentId = elem.textContent;
+     else
+          alert("ERROR! Wrong type of an argument! It must be block or connector!");
+
+     linesList = [].slice.call(linesList);
+     linesList = linesList.filter(function(line) {
+          return line.textContent.includes(contentId);
+     });
+
+     return linesList;
+}
+
+// find connectors used in connecting given in LinesList lines
+function findConnectedCons(linesList) {
+     var consList = document.getElementsByClassName('con'),
+         consIds = [];
+
+     // fill the list of connectors' ids used in each line
+     linesList.forEach(function(line) {
+          var conPairIds = line.textContent.split('|');
+          consIds.push(conPairIds[0], conPairIds[1]);
+     });
+
+     consList = [].slice.call(consList);
+     consList = consList.filter(function(con) {
+          return consIds.includes(con.textContent);
+     });
+
+     return consList;
 }

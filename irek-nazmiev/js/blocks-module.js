@@ -1,38 +1,93 @@
 var maxBlockId = 0;
 
 function addBlock(content) {
-     var inputConnectors = '<button class="in-con con"'
-               + ' onclick="connect(this);" name="no-con"></button>',
-         outputConnectors = '<button class="out-con con"'
-               +' onclick="connect(this);" name="no-con"></button>';
      var fieldMovable = document.getElementById('field-movable'),
          fieldMovableCoords = fieldMovable.getBoundingClientRect();
-     var block = document.createElement("button");
 
-     block.className = "block";
-     block.setAttribute("onmousemove", "moveBlock(this);");
-     block.style.left = -fieldMovableCoords.x +
-          document.body.clientWidth/2 + 'px';
-     block.style.top = -fieldMovableCoords.y +
-          document.body.clientHeight/2 + 'px';
-     block.name = maxBlockId++;
+     var inputConnector = createConnector("input"),
+         outputConnector = createConnector("output");
 
-     if (content == 'input')
-          inputConnectors = "";
-     else if (content == 'output')
-          outputConnectors = "";
-     else if (content == 'isSubstring')
-          inputConnectors = inputConnectors.repeat(1);
-     else if (content == 'replace')
-          inputConnectors = inputConnectors.repeat(3);
-     else
-          inputConnectors = inputConnectors.repeat(2);
+     var inputCons = createConWrapper("input"),
+         outputCons = createConWrapper("output");
 
-     block.innerHTML = content + '<div class="input-connectors connectors">'
-                     + inputConnectors
-                     + '</div><div class="output-connectors connectors">'
-                     + outputConnectors + '</div>';
-     field.children[0].appendChild(block);
+     var block = createBlock();
+
+     var maxConId = 0;
+
+     if (content == 'input') {
+          appendChildren(0, 1);
+     } else if (content == 'output') {
+          appendChildren(1, 0);
+     } else if (content == 'isSubstring') {
+          appendChildren(1, 1);
+     } else if (content == 'replace') {
+          appendChildren(3, 1);
+     } else {
+          appendChildren(2, 1);
+     }
+
+     fieldMovable.appendChild(block);
+
+     function appendChildren(inConAmount, outConAmount) {
+
+          fillConWrapper(inputCons, inputConnector, inConAmount);
+          fillConWrapper(outputCons, outputConnector, outConAmount);
+
+          function fillConWrapper(conWrapper, connectorType, conAmount) {
+               for (i = 0; i < conAmount; i++) {
+                    var conClone = connectorType.cloneNode();
+                    conClone.textContent = block.name + "-" + maxConId++;
+                    conWrapper.appendChild(conClone);
+               }
+          }
+     }
+
+     function createConnector(type) {
+          var connector = document.createElement("button");
+
+          if (type == "input")
+               connector.className = "in-con con";
+          else if (type == "output")
+               connector.className = "out-con con";
+          else
+               alert("ERROR! Wrong type of connector!");
+
+          connector.setAttribute("onmousemove", "connect(this);");
+          connector.name = "no-con";
+
+          return connector;
+     }
+
+     function createConWrapper(type) {
+          var conWrapper = document.createElement('div');
+
+          if (type == "input")
+               conWrapper.className = "input-connectors connectors";
+          else if (type == "output")
+               conWrapper.className = "output-connectors connectors";
+          else
+               alert("ERROR! Wrong type of connector!");
+
+          return conWrapper;
+     }
+
+     function createBlock() {
+          var block = document.createElement("button"),
+              screenWidth = document.body.clientWidth,
+              screenHeight = document.body.clientHeight;
+
+          block.textContent = content;
+          block.className = "block";
+          block.style.left = -fieldMovableCoords.x + screenWidth/2 + 'px';
+          block.style.top = -fieldMovableCoords.y + screenHeight/2 + 'px';
+          block.setAttribute("onmousemove", "moveBlock(this);");
+          block.name = maxBlockId++;
+
+          block.appendChild(inputCons);
+          block.appendChild(outputCons);
+
+          return block;
+     }
 }
 
 function openCloseSpoiler(block) {
